@@ -1,23 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
 :root {
-    --primary-color:  rgb(13,106, 134);
+    --primary-color: rgb(13, 106, 134);
     --primary-color-darker: rgb(9, 48, 56);
+    --danger-color: rgb(206, 71, 71);
 }
 
 * {
-  box-sizing: border-box;
-  outline: 0;
+    box-sizing: border-box;
+    outline: 0;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--primary-color);
-  font-family: 'Open sans', sans-serif;
-  font-size: 1.3em;
-  line-height: 1.5;
-  
+    margin: 0;
+    padding: 0;
+    background-color: var(--primary-color);
+    font-family: 'Open sans', sans-serif;
+    font-size: 1.3em;
+    line-height: 1.5;
+
 }
 
 .container {
@@ -28,23 +29,31 @@ body {
     border-radius: 10px;
 }
 
-form input, form label, form button {
-   display: block;
-   width: 100%;
-   margin-bottom: 10px;
+form {
+  margin-bottom: 30px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 20px;
 }
 
-form input{
+form input,
+form label,
+form button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+form input {
     font-size: 24px;
     height: 50px;
     padding: 0 20px;
 }
 
-form input:focus{
+form input:focus {
     outline: 1px solid var(--primary-color)
 }
 
-form button{
+form button {
     border: none;
     background: var(--primary-color);
     color: #fff;
@@ -56,10 +65,56 @@ form button{
 }
 
 
-form button:hover{
+form button:hover {
     background: var(--primary-color-darker);
 }
 
-form button:active{
+form button:active {
     background: red;
+}
+
+.tarefas {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.item-tarefa {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+    background-color: #fefefe;
+    border-radius: 6px;
+}
+
+.texto-tarefa {
+    flex: 1;
+}
+
+.apagar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--danger-color);
+    padding: 5px;
+    color: #FFF;
+    cursor: pointer;
+    border: 0;
+    margin-left: 20px;
+    flex-shrink: 0;
+}
+
+.apagar i {
+   font-size: 18px;
+}
+
+.apagar:hover {
+    background-color: rgb(236, 24, 24);
+    outline: 1px solid rgba(0, 0, 0, 0.3)
+}
+
+.apagar:active {
+    background-color: rgb(214, 106, 106);
 }

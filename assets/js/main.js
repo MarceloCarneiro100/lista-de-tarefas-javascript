@@ -10,10 +10,35 @@ function app() {
         return li;
     }
 
+    function criaBotaoApagar(li) {
+        const botao = document.createElement('button');
+        botao.className = 'apagar';
+        botao.title = 'Apagar esta tarefa';
+
+        const icone = document.createElement('i');
+        icone.classList.add('fas', 'fa-trash', 'fa-lg')
+      
+        botao.appendChild(icone);
+        li.appendChild(botao);
+    }
+
+    function limparCampo() {
+        inputTarefa.value = '';
+        inputTarefa.focus();
+    }
+
     function criaTarefas(input) {
         const li = criaLi();
-        li.innerText = input;
+        li.classList.add('item-tarefa');
+
+        const span = document.createElement('span');
+        span.classList.add('texto-tarefa');
+        span.innerText = input;
+
+        li.appendChild(span);
+        criaBotaoApagar(li)
         tarefasUl.appendChild(li);
+        limparCampo();
     }
 
     btn.addEventListener('click', function (e) {
