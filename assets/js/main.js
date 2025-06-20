@@ -17,7 +17,7 @@ function app() {
 
         const icone = document.createElement('i');
         icone.classList.add('fas', 'fa-trash', 'fa-lg')
-      
+
         botao.appendChild(icone);
         li.appendChild(botao);
     }
@@ -41,11 +41,23 @@ function app() {
         limparCampo();
     }
 
+    function eliminaTarefas(e) {
+        const botao = e.target.closest('.apagar');
+        if (!botao) return;
+
+        const li = botao.closest('li');
+        if (li) li.remove();
+    }
+
     btn.addEventListener('click', function (e) {
-         e.preventDefault();
-         const valor = inputTarefa.value.trim();
-         if(!valor) return;
-         criaTarefas(valor);
+        e.preventDefault();
+        const valor = inputTarefa.value.trim();
+        if (!valor) return;
+        criaTarefas(valor);
+    });
+
+    tarefasUl.addEventListener('click', function (e) {
+        eliminaTarefas(e);
     });
 }
 
