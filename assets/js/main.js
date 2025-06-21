@@ -71,10 +71,19 @@ function app() {
             if (texto) {
                 texto.title = item.classList.contains('concluida')
                     ? 'Clique para reabrir a tarefa'
-                    : 'Clique para marcar como concluída'
+                    : 'Clique para marcar como concluída';
             }
         }
     }
+
+    // Cria uma tarefa ao pressionar a tecla ENTER na caixa de texto
+    inputTarefa.addEventListener('keypress', function (e) {
+        if (e.keyCode === 13) {
+            const valor = inputTarefa.value.trim();
+            if (!valor) return;
+            criaTarefas(valor);
+        }
+    });
 
     btn.addEventListener('click', function (e) {
         e.preventDefault();
