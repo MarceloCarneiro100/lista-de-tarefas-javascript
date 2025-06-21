@@ -91,6 +91,7 @@ form button:active {
 
 .texto-tarefa {
     flex: 1;
+    cursor: pointer;
 }
 
 .apagar {
@@ -117,4 +118,13 @@ form button:active {
 
 .apagar:active {
     background-color: rgb(214, 106, 106);
+}
+
+.badge {
+    background-color: #28a745;
+    color: #FFF;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    margin-left: 10px;
 }

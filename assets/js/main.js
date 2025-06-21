@@ -27,6 +27,16 @@ function app() {
         inputTarefa.focus();
     }
 
+    function criaBadgeConcluida() {
+        // Criar badge concluída, mas só adicionar depois
+        const badge = document.createElement('span');
+        badge.classList.add('badge');
+        badge.innerText = "Concluída";
+        badge.style.display = 'none';    // Começa invisível
+
+        return badge;
+    }
+
     function criaTarefas(input) {
         const li = criaLi();
         li.classList.add('item-tarefa');
@@ -34,8 +44,13 @@ function app() {
         const span = document.createElement('span');
         span.classList.add('texto-tarefa');
         span.innerText = input;
-
+        span.title = 'Clique para marcar como concluída';
         li.appendChild(span);
+
+        // Cria uma badge com status concluída (inicialmente invisível)
+        const badge = criaBadgeConcluida();
+        li.appendChild(badge);
+
         criaBotaoApagar(li)
         tarefasUl.appendChild(li);
         limparCampo();
@@ -49,6 +64,27 @@ function app() {
         if (li) li.remove();
     }
 
+    function tornaTarefasConcluidas(e) {
+        const item = e.target.closest('.item-tarefa');
+
+        if (item && e.target.classList.contains('texto-tarefa')) {
+            item.classList.toggle('concluida');
+            const badge = item.querySelector('.badge');
+            const texto = item.querySelector('.texto-tarefa');
+
+            if (badge) {
+                const estaConcluida = item.classList.contains('concluida');
+                badge.style.display = estaConcluida ? 'inline-block' : 'none';
+
+                if(texto) {
+                    texto.title = estaConcluida 
+                    ? 'Clique para reabrir a tarefa'
+                    : 'Clique para marcar como concluída'
+                }
+            }
+        }
+    }
+
     btn.addEventListener('click', function (e) {
         e.preventDefault();
         const valor = inputTarefa.value.trim();
@@ -58,6 +94,7 @@ function app() {
 
     tarefasUl.addEventListener('click', function (e) {
         eliminaTarefas(e);
+        tornaTarefasConcluidas(e);
     });
 }
 
