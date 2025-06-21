@@ -30,9 +30,9 @@ body {
 }
 
 form {
-  margin-bottom: 30px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 20px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 20px;
 }
 
 form input,
@@ -87,11 +87,36 @@ form button:active {
     margin-bottom: 10px;
     background-color: #fefefe;
     border-radius: 6px;
+    transition: background-color 0.6s ease, color 0.6s ease;
+}
+
+.item-tarefa.concluida {
+    background-color: #e6f4ea;
+    border-left: 5px solid #28a745;
+}
+
+.item-tarefa.concluida .texto-tarefa {
+    color: #2d662f;
 }
 
 .texto-tarefa {
     flex: 1;
     cursor: pointer;
+}
+
+.item-tarefa.concluida .badge {
+    opacity: 1;
+}
+
+.badge {
+    background-color: #28a745;
+    color: #FFF;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    margin-left: 10px;
+    opacity: 0;
+    transition: opacity 0.6 ease;
 }
 
 .apagar {
@@ -108,7 +133,7 @@ form button:active {
 }
 
 .apagar i {
-   font-size: 18px;
+    font-size: 18px;
 }
 
 .apagar:hover {
@@ -118,13 +143,4 @@ form button:active {
 
 .apagar:active {
     background-color: rgb(214, 106, 106);
-}
-
-.badge {
-    background-color: #28a745;
-    color: #FFF;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    margin-left: 10px;
 }

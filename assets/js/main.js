@@ -28,12 +28,9 @@ function app() {
     }
 
     function criaBadgeConcluida() {
-        // Criar badge concluída, mas só adicionar depois
         const badge = document.createElement('span');
         badge.classList.add('badge');
         badge.innerText = "Concluída";
-        badge.style.display = 'none';    // Começa invisível
-
         return badge;
     }
 
@@ -69,18 +66,12 @@ function app() {
 
         if (item && e.target.classList.contains('texto-tarefa')) {
             item.classList.toggle('concluida');
-            const badge = item.querySelector('.badge');
             const texto = item.querySelector('.texto-tarefa');
 
-            if (badge) {
-                const estaConcluida = item.classList.contains('concluida');
-                badge.style.display = estaConcluida ? 'inline-block' : 'none';
-
-                if(texto) {
-                    texto.title = estaConcluida 
+            if (texto) {
+                texto.title = item.classList.contains('concluida')
                     ? 'Clique para reabrir a tarefa'
                     : 'Clique para marcar como concluída'
-                }
             }
         }
     }
