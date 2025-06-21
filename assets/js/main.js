@@ -1,9 +1,14 @@
 function app() {
-    const formulario = document.querySelector('.form');
+    const formulario  = document.querySelector('.form');
     const inputTarefa = formulario.querySelector('.tarefa');
-    const btn = formulario.querySelector('.btn');
-    const tarefasUl = document.querySelector('.tarefas');
+    const btn         = formulario.querySelector('.btn');
+    const tarefasUl   = document.querySelector('.tarefas');
+    const inputEdicao = document.getElementById('input-edicao');
+    const modal       = document.getElementById('modal-editar');
+    const btnSalvar   = document.getElementById('btn-salvar');
+    const btnCancelar = document.getElementById('btn-cancelar');
 
+    let liAtual = null;  // Referência à tarefa sendo editada
 
     function criaLi() {
         const li = document.createElement('li');
@@ -17,6 +22,18 @@ function app() {
 
         const icone = document.createElement('i');
         icone.classList.add('fas', 'fa-trash', 'fa-lg')
+
+        botao.appendChild(icone);
+        li.appendChild(botao);
+    }
+
+    function criaBotaoEditar(li) {
+        const botao = document.createElement('button');
+        botao.className = 'editar';
+        botao.title = 'Editar esta tarefa';
+
+        const icone = document.createElement('i');
+        icone.classList.add('fas', 'fa-pen', 'fa-lg');
 
         botao.appendChild(icone);
         li.appendChild(botao);
@@ -48,9 +65,20 @@ function app() {
         const badge = criaBadgeConcluida();
         li.appendChild(badge);
 
+        criaBotaoEditar(li);
         criaBotaoApagar(li)
         tarefasUl.appendChild(li);
         limparCampo();
+    }
+
+    function editaTarefas(e) {
+        const botaoEditar = e.target.closest('.editar');
+        if (!botaoEditar) return;
+
+        liAtual = botaoEditar.closest('li');
+        const texto = liAtual.querySelector('.texto-tarefa');
+        inputEdicao.value = texto.innerText;
+        modal.style.display = 'flex';
     }
 
     function eliminaTarefas(e) {
@@ -59,6 +87,21 @@ function app() {
 
         const li = botao.closest('li');
         if (li) li.remove();
+    }
+
+    function salvaEdicaoModal() {
+       if (liAtual) {
+            const texto = liAtual.querySelector('.texto-tarefa');
+            const valor = inputEdicao.value.trim();
+            if (!valor) {
+                alert('Ops! Parece que você esqueceu de digitar a tarefa.');
+                return;
+            }
+
+            texto.innerText = valor;
+            modal.style.display = 'none';
+            liAtual = null;
+        }
     }
 
     function tornaTarefasConcluidas(e) {
@@ -95,8 +138,23 @@ function app() {
     tarefasUl.addEventListener('click', function (e) {
         eliminaTarefas(e);
         tornaTarefasConcluidas(e);
+        editaTarefas(e);
+    });
+
+    btnSalvar.addEventListener('click', function() {
+        salvaEdicaoModal();
+    });
+
+    inputEdicao.addEventListener('keypress', function(e){
+        if(e.code === 'Enter') {
+           salvaEdicaoModal(); 
+        }
+    });
+
+    btnCancelar.addEventListener('click', function () {
+        modal.style.display = 'none';
+        liAtual = null;
     });
 }
-
 
 app();
