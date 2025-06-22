@@ -32,6 +32,8 @@ body {
 }
 
 form {
+    display: flex;
+    align-items: center;
     margin-bottom: 30px;
     border-bottom: 1px solid #ddd;
     padding-bottom: 20px;
@@ -46,9 +48,12 @@ form button {
 }
 
 form input {
-    font-size: 24px;
+    font-size: 1.2em;
     height: 50px;
     padding: 0 20px;
+    flex: 1;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
 }
 
 form input:focus {
@@ -58,12 +63,18 @@ form input:focus {
 form button {
     border: none;
     background: var(--primary-color);
+    padding: 0 20px;
     color: #fff;
     font-size: 18px;
     font-weight: 700;
     height: 50px;
+    width: auto;
     cursor: pointer;
-    margin-top: 30px;
+    margin-top: 0;
+    white-space: nowrap;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    transition: background-color 0.3s ease;
 }
 
 
@@ -79,6 +90,10 @@ form button:active {
     background-color: #f9f9f9;
     padding: 20px;
     border-radius: 8px;
+}
+
+.tarefas:empty {
+    display: none;
 }
 
 .item-tarefa {
@@ -134,6 +149,7 @@ form button:active {
     border: 0;
     margin-left: 20px;
     flex-shrink: 0;
+    transition: background-color 0.3s ease;
 }
 
 .editar {
@@ -151,12 +167,10 @@ form button:active {
 
 .editar:hover {
     background-color: rgb(218, 165, 32);
-    outline: 1px solid rgba(0, 0, 0, 0.3);
 }
 
 .apagar:hover {
     background-color: rgb(236, 24, 24);
-    outline: 1px solid rgba(0, 0, 0, 0.3)
 }
 
 .apagar:active {
@@ -216,6 +230,7 @@ form button:active {
     height: 50px;
     cursor: pointer;
     padding: 10px;
+    transition: background-color 0.3s ease;
 }
 
 .botoes-modal #btn-salvar {
