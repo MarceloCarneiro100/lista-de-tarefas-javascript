@@ -61,6 +61,9 @@ function app() {
         span.title = 'Clique para marcar como concluída';
         li.appendChild(span);
 
+        const dataAtual = new Date().toLocaleString('pt-BR');
+        li.setAttribute('data-criacao', dataAtual);
+
         // Cria uma badge com status concluída (inicialmente invisível)
         const badge = criaBadgeConcluida();
         li.appendChild(badge);
@@ -78,6 +81,19 @@ function app() {
         liAtual = botaoEditar.closest('li');
         const texto = liAtual.querySelector('.texto-tarefa');
         inputEdicao.value = texto.innerText;
+
+        const dataCriacaoEl = document.querySelector('.data-criacao');
+        dataCriacaoEl.innerHTML = `<p>📆 Data criação: ${liAtual.getAttribute('data-criacao')}</p>`;
+
+        const dataConclusaoEl = document.querySelector('.data-conclusao');
+        if (liAtual.hasAttribute('data-conclusao')) {
+            const dataConclusao = liAtual.getAttribute('data-conclusao');
+            dataConclusaoEl.innerHTML = `<p>✅ Data de conclusão: <b>${dataConclusao}</b></p>`;
+            dataConclusaoEl.style.color = 'red';
+        } else {
+            dataConclusaoEl.innerHTML = '';
+        }
+
         modal.style.display = 'flex';
     }
 
@@ -90,7 +106,7 @@ function app() {
     }
 
     function salvaEdicaoModal() {
-       if (liAtual) {
+        if (liAtual) {
             const texto = liAtual.querySelector('.texto-tarefa');
             const valor = inputEdicao.value.trim();
             if (!valor) {
@@ -115,6 +131,13 @@ function app() {
                 texto.title = item.classList.contains('concluida')
                     ? 'Clique para reabrir a tarefa'
                     : 'Clique para marcar como concluída';
+
+                if (item.classList.contains('concluida')) {
+                    const dataConclusao = new Date().toLocaleString('pt-BR');
+                    item.setAttribute('data-conclusao', dataConclusao);
+                } else {
+                    item.removeAttribute('data-conclusao');
+                }
             }
         }
     }
@@ -141,13 +164,13 @@ function app() {
         editaTarefas(e);
     });
 
-    btnSalvar.addEventListener('click', function() {
+    btnSalvar.addEventListener('click', function () {
         salvaEdicaoModal();
     });
 
-    inputEdicao.addEventListener('keypress', function(e){
-        if(e.code === 'Enter') {
-           salvaEdicaoModal(); 
+    inputEdicao.addEventListener('keypress', function (e) {
+        if (e.code === 'Enter') {
+            salvaEdicaoModal();
         }
     });
 

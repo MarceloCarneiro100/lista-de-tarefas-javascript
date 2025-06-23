@@ -13,7 +13,7 @@
     <section class="container">
         <h1>Lista de tarefas</h1>
         <form class="form">
-             <input type="text" class="tarefa" id="input-tarefa" maxlength="200" placeholder="Insira sua tarefa">
+             <input type="text" class="tarefa" id="input-tarefa" maxlength="100" placeholder="Insira sua tarefa">
              <button class="btn" id="btn-tarefa">Enviar</button>
         </form>
         <ul class="tarefas"></ul>
@@ -23,7 +23,9 @@
         <div class="modal-conteudo">
             <h2 class="titulo-tarefa">Editar tarefa</h2>
             <hr>
-            <input type="text" id="input-edicao" maxlength="200" placeholder="Edite sua tarefa">
+            <input type="text" id="input-edicao" maxlength="100" placeholder="Edite sua tarefa">
+            <div class="data-criacao"></div>
+            <div class="data-conclusao"></div>
             <div class="botoes-modal">
                 <button id="btn-salvar">Salvar</button>
                 <button id="btn-cancelar">Cancelar</button>
