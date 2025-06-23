@@ -74,6 +74,15 @@ function app() {
         limparCampo();
     }
 
+    function abrirModal() {
+        modal.classList.add('ativo');
+    }
+
+    function fecharModal() {
+        modal.classList.remove('ativo');
+        liAtual = null;
+    }
+
     function editaTarefas(e) {
         const botaoEditar = e.target.closest('.editar');
         if (!botaoEditar) return;
@@ -94,7 +103,7 @@ function app() {
             dataConclusaoEl.innerHTML = '';
         }
 
-        modal.style.display = 'flex';
+        abrirModal();
     }
 
     function eliminaTarefas(e) {
@@ -115,8 +124,7 @@ function app() {
             }
 
             texto.innerText = valor;
-            modal.style.display = 'none';
-            liAtual = null;
+            fecharModal();
         }
     }
 
@@ -175,8 +183,7 @@ function app() {
     });
 
     btnCancelar.addEventListener('click', function () {
-        modal.style.display = 'none';
-        liAtual = null;
+        fecharModal();
     });
 }
 
