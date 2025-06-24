@@ -1,3 +1,4 @@
+
 function app() {
     const formulario  = document.querySelector('.form');
     const inputTarefa = formulario.querySelector('.tarefa');
@@ -91,16 +92,23 @@ function app() {
         const texto = liAtual.querySelector('.texto-tarefa');
         inputEdicao.value = texto.innerText;
 
-        const dataCriacaoEl = document.querySelector('.data-criacao');
-        dataCriacaoEl.innerHTML = `<p>📆 Data criação: ${liAtual.getAttribute('data-criacao')}</p>`;
+        const dataCriacaoEl = modal.querySelector('.data-criacao');
+        dataCriacaoEl.innerHTML = `<p>📆 Data de criação: ${liAtual.getAttribute('data-criacao')}</p>`;
 
-        const dataConclusaoEl = document.querySelector('.data-conclusao');
+        const dataConclusaoEl = modal.querySelector('.data-conclusao');
+        const duracaoEl = modal.querySelector('.duracao');
+
         if (liAtual.hasAttribute('data-conclusao')) {
+
+            const dataCriacao = liAtual.getAttribute('data-criacao');
             const dataConclusao = liAtual.getAttribute('data-conclusao');
+
             dataConclusaoEl.innerHTML = `<p>✅ Data de conclusão: <b>${dataConclusao}</b></p>`;
+            duracaoEl.innerHTML = `<p>⌚ Duração: <b>${calcularDuracaoComDayjs(dataCriacao, dataConclusao)}</b></p>`;
             dataConclusaoEl.style.color = 'red';
         } else {
             dataConclusaoEl.innerHTML = '';
+            duracaoEl.innerHTML = ''
         }
 
         abrirModal();
@@ -140,11 +148,21 @@ function app() {
                     ? 'Clique para reabrir a tarefa'
                     : 'Clique para marcar como concluída';
 
+                const duracaoEl = modal.querySelector('.duracao');
+
                 if (item.classList.contains('concluida')) {
+                    
+                    const dataCriacao = item.getAttribute('data-criacao');
                     const dataConclusao = new Date().toLocaleString('pt-BR');
                     item.setAttribute('data-conclusao', dataConclusao);
+                    
+                    const duracaoMs = parseDataBR(dataConclusao) - parseDataBR(dataCriacao);
+                    item.setAttribute('data-duracao', duracaoMs.toString());
+
+                    duracaoEl.innerHTML =  `<p>⌚ Duração: <b>${calcularDuracaoComDayjs(dataCriacao, dataConclusao)}</b></p>`;
                 } else {
                     item.removeAttribute('data-conclusao');
+                    duracaoEl.innerHTML = ''
                 }
             }
         }
@@ -177,7 +195,7 @@ function app() {
     });
 
     inputEdicao.addEventListener('keypress', function (e) {
-        if (e.code === 'Enter') {
+        if (e.code === 'Enter' || e.key == 'Enter') {
             salvaEdicaoModal();
         }
     });

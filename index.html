@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,13 +9,14 @@
 
     <link rel="stylesheet" href="./assets/css/style.css">
 </head>
+
 <body>
-    
+
     <section class="container">
         <h1>Lista de tarefas</h1>
         <form class="form">
-             <input type="text" class="tarefa" id="input-tarefa" maxlength="100" placeholder="Insira sua tarefa">
-             <button class="btn" id="btn-tarefa">Enviar</button>
+            <input type="text" class="tarefa" id="input-tarefa" maxlength="100" placeholder="Insira sua tarefa">
+            <button class="btn" id="btn-tarefa">Enviar</button>
         </form>
         <ul class="tarefas"></ul>
     </section>
@@ -26,12 +28,25 @@
             <input type="text" id="input-edicao" maxlength="100" placeholder="Edite sua tarefa">
             <div class="data-criacao"></div>
             <div class="data-conclusao"></div>
+            <div class="duracao"></div>
             <div class="botoes-modal">
                 <button id="btn-salvar">Salvar</button>
                 <button id="btn-cancelar">Cancelar</button>
             </div>
         </div>
     </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/duration.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/relativeTime.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/pt-br.js"></script>
+    <script>
+        dayjs.extend(dayjs_plugin_duration);
+        dayjs.extend(dayjs_plugin_relativeTime);
+        dayjs.locale('pt-br');
+    </script>
+    <script src="./assets/js/utils/funcoesTempo.js"></script>
     <script src="./assets/js/main.js"></script>
 </body>
+
 </html>
