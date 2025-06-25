@@ -23,19 +23,33 @@
 
     <div class="modal" id="modal-editar">
         <div class="modal-conteudo">
+            <button id="btn-fechar-edicao" class="fechar-modal" title="Fechar edição">&times;</button>
             <h2 class="titulo-tarefa">Editar tarefa</h2>
             <hr>
             <input type="text" id="input-edicao" maxlength="100" placeholder="Edite sua tarefa">
             <div class="data-criacao"></div>
-            <div class="data-conclusao"></div>
-            <div class="duracao"></div>
             <div class="botoes-modal">
                 <button id="btn-salvar">Salvar</button>
                 <button id="btn-cancelar">Cancelar</button>
             </div>
         </div>
     </div>
-    
+
+    <div class="modal" id="modal-info">
+        <div class="modal-conteudo">
+            <button id="btn-fechar-info" class="fechar-modal" title="Fechar detalhes">&times;</button>
+            <h2>Detalhes da Tarefa</h2>
+            <hr>
+            <div class="info-criacao"></div>
+            <div class="info-conclusao"></div>
+            <div class="info-duracao"></div>
+            <div class="botoes-modal">
+                <button id="btn-cancelar-info">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/duration.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/relativeTime.js"></script>
