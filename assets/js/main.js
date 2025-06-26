@@ -22,6 +22,7 @@ function app() {
 
         criaBotaoEditar(container);
         criaBotaoApagar(container);
+        criaBotaoDetalhar(container);
 
         return container;
     }
@@ -48,6 +49,14 @@ function app() {
 
         botao.appendChild(icone);
         container.appendChild(botao);
+    }
+
+    function criaBotaoDetalhar(container) {
+         const botao = document.createElement('button');
+         botao.className = 'detalhar';
+         botao.title = 'Ver detalhes da tarefa';
+         botao.innerHTML = '<i class="fas fa-info-circle"></i>';
+         container.appendChild(botao);
     }
 
     function limparCampo() {
@@ -86,6 +95,8 @@ function app() {
         li.appendChild(containerBotoes);
         tarefasUl.appendChild(li);
         limparCampo();
+
+        salvarTarefasNoLocalStorage();
     }
 
     function abrirModal() {
@@ -105,11 +116,6 @@ function app() {
         const texto = liAtual.querySelector('.texto-tarefa');
         inputEdicao.value = texto.innerText;
 
-        const dataCriacao = liAtual.getAttribute('data-criacao');
-
-        document.querySelector('#modal-editar .data-criacao').innerHTML =
-            `<p><strong>📅 Criada:</strong> ${dataCriacao}</p>`;
-
         abrirModal();
     }
 
@@ -128,6 +134,7 @@ function app() {
             texto.classList.add('animada');
             setTimeout(() => texto.classList.remove('animada'), 300);
 
+            salvarTarefasNoLocalStorage();
             fecharModal();
         }
     }
@@ -168,14 +175,6 @@ function app() {
                 item.insertBefore(icone, item.firstChild);
             }
 
-            if (!item.querySelector('.detalhar')) {
-                const botao = document.createElement('button');
-                botao.className = 'detalhar';
-                botao.title = 'Ver detalhes da tarefa';
-                botao.innerHTML = '<i class="fas fa-info-circle"></i>';
-                const containerBotoes = item.querySelector('.botoes-acoes');
-                if (containerBotoes) containerBotoes.appendChild(botao);
-            }
         } else {
             item.removeAttribute('data-conclusao');
             item.removeAttribute('data-duracao');
@@ -185,11 +184,56 @@ function app() {
             // Remove ícone
             const icone = item.querySelector('.icone-check');
             if (icone) icone.remove();
-
-            // Remove o botão se a tarefa for reaberta
-            const botaoDetalhar = item.querySelector('.detalhar');
-            if (botaoDetalhar) botaoDetalhar.remove();
         }
+        salvarTarefasNoLocalStorage();
+    }
+
+    function salvarTarefasNoLocalStorage() {
+        const tarefas = [...document.querySelectorAll('.item-tarefa')].map(li => ({
+            texto: li.querySelector('.texto-tarefa').innerText,
+            concluida: li.classList.contains('concluida'),
+            criacao: li.getAttribute('data-criacao'),
+            conclusao: li.getAttribute('data-conclusao')
+        }));
+        localStorage.setItem('tarefas', JSON.stringify(tarefas));
+    }
+
+    function carregaTarefasDoLocalStorage() {
+        const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
+
+        tarefas.forEach(tarefa => {
+            const li = criaLi();
+            li.classList.add('item-tarefa');
+            if(tarefa.concluida) {
+                li.classList.add('concluida');
+                li.setAttribute('data-conclusao', tarefa.conclusao);
+            }
+            li.setAttribute('data-criacao', tarefa.criacao);
+
+            const span = document.createElement('span');
+            span.classList.add('texto-tarefa');
+            span.innerText = tarefa.texto;
+            span.title = tarefa.concluida
+                ? 'Clique para reabrir a tarefa'
+                : 'Clique para marcar como concluída';
+            li.appendChild(span);
+
+            const badge = criaBadgeConcluida();
+            li.appendChild(badge);
+
+            const containerBotoes = criaContainerBotoes();
+            li.appendChild(containerBotoes);
+
+            if(tarefa.concluida) {
+                const icone = document.createElement('i');
+                icone.classList.add('fas', 'fa-check-circle', 'icone-check');
+                icone.style.color = 'green';
+                icone.style.marginRight = '8px';
+                li.insertBefore(icone, li.firstChild);
+            }
+
+            tarefasUl.appendChild(li);
+        });
     }
 
     // Cria uma tarefa ao pressionar a tecla ENTER na caixa de texto
@@ -209,15 +253,18 @@ function app() {
     });
 
     function obterInfoTarefa(li) {
+        const tarefa = li.querySelector('.texto-tarefa').innerText;
         const criacao = li.getAttribute('data-criacao') || '---';
         const conclusao = li.getAttribute('data-conclusao') || '---';
         const duracao = li.getAttribute('data-conclusao')
             ? calcularDuracaoComDayjs(criacao, conclusao)
             : '---';
-        return { criacao, conclusao, duracao };
+        return { tarefa, criacao, conclusao, duracao };
     }
 
-    function renderizarInfoModal({ criacao, conclusao, duracao }) {
+    function renderizarInfoModal({ tarefa, criacao, conclusao, duracao }) {
+        document.querySelector('#modal-info .info-tarefa').innerHTML = 
+        `<p><em>${tarefa}</em></p>`
         document.querySelector('#modal-info .info-criacao').innerHTML =
             `<p><strong>📅 Criada:</strong> ${criacao}</p>`;
         document.querySelector('#modal-info .info-conclusao').innerHTML =
@@ -237,6 +284,7 @@ function app() {
 
         if (botaoApagar) {
             item.remove();
+            salvarTarefasNoLocalStorage();
         } else if (botaoEditar) {
             editaTarefas(e);
         } else if (botaoDetalhar) {
@@ -276,6 +324,7 @@ function app() {
     registrarFechamentoModal('modal-info', 'btn-fechar-info');
     registrarFechamentoModal('modal-info', 'btn-cancelar-info');
 
+    carregaTarefasDoLocalStorage();
 }
 
 app();
