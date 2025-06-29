@@ -71,31 +71,56 @@ function app() {
         return badge;
     }
 
-    function criaTarefas(input) {
-        const li = criaLi();
-        li.classList.add('item-tarefa');
+    function montaTarefa({ texto, concluida, criacao, conclusao }) {
+         const li = criaLi();
+         li.classList.add('item-tarefa');
+         if (concluida) li.classList.add('concluida');
+         li.setAttribute('data-criacao', criacao);
+         if (conclusao) li.setAttribute('data-conclusao', conclusao);
 
-        const span = document.createElement('span');
-        span.classList.add('texto-tarefa');
-        span.innerText = input;
-        span.title = 'Clique para marcar como concluída';
-        li.appendChild(span);
+         // texto
+         const span = document.createElement('span');
+         span.className = 'texto-tarefa';
+         span.innerText = texto;
+         span.title = concluida 
+            ? 'Clique para reabrir a tarefa'
+            : 'Clique para marcar como concluída';
 
         span.classList.add('animada');
         setTimeout(() => span.classList.remove('animada'), 300);
 
-        const dataAtual = new Date().toLocaleString('pt-BR');
-        li.setAttribute('data-criacao', dataAtual);
+        
+        li.appendChild(span);
 
-        // Cria uma badge com status concluída (inicialmente invisível)
+        // badge, botões, ícones, etc
         const badge = criaBadgeConcluida();
         li.appendChild(badge);
 
         const containerBotoes = criaContainerBotoes();
         li.appendChild(containerBotoes);
-        tarefasUl.appendChild(li);
-        limparCampo();
 
+        if (concluida) {
+           const icone = document.createElement('i');
+           icone.classList.add('fas', 'fa-check-circle', 'icone-check');
+           icone.style.color = 'green';
+           icone.style.marginRight = '8px';
+           li.insertBefore(icone, li.firstChild); 
+        }
+        
+        tarefasUl.appendChild(li);
+        return li;
+    }
+
+    function criaTarefas(texto) {
+        const tarefa = {
+           texto, 
+           concluida: false,
+           criacao: new Date().toLocaleString('pt-BR'),
+           conclusao: null
+        };
+
+        montaTarefa(tarefa);
+        limparCampo();
         salvarTarefasNoLocalStorage();
     }
 
@@ -199,41 +224,8 @@ function app() {
     }
 
     function carregaTarefasDoLocalStorage() {
-        const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
-
-        tarefas.forEach(tarefa => {
-            const li = criaLi();
-            li.classList.add('item-tarefa');
-            if(tarefa.concluida) {
-                li.classList.add('concluida');
-                li.setAttribute('data-conclusao', tarefa.conclusao);
-            }
-            li.setAttribute('data-criacao', tarefa.criacao);
-
-            const span = document.createElement('span');
-            span.classList.add('texto-tarefa');
-            span.innerText = tarefa.texto;
-            span.title = tarefa.concluida
-                ? 'Clique para reabrir a tarefa'
-                : 'Clique para marcar como concluída';
-            li.appendChild(span);
-
-            const badge = criaBadgeConcluida();
-            li.appendChild(badge);
-
-            const containerBotoes = criaContainerBotoes();
-            li.appendChild(containerBotoes);
-
-            if(tarefa.concluida) {
-                const icone = document.createElement('i');
-                icone.classList.add('fas', 'fa-check-circle', 'icone-check');
-                icone.style.color = 'green';
-                icone.style.marginRight = '8px';
-                li.insertBefore(icone, li.firstChild);
-            }
-
-            tarefasUl.appendChild(li);
-        });
+         const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
+         tarefas.forEach(montaTarefa);
     }
 
     // Cria uma tarefa ao pressionar a tecla ENTER na caixa de texto
