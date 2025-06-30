@@ -13,9 +13,16 @@
 <body>
 
     <section class="container">
-         <div class="topo">
+        <div class="topo">
             <h1>Lista de tarefas</h1>
-            <input type="text" id="input-busca" placeholder="🔎 Buscar tarefas...">
+            <div class="filtros">
+                <select id="filtro-status">
+                    <option value="todas">Todas</option>
+                    <option value="pendentes">Pendentes</option>
+                    <option value="concluidas">Concluídas</option>
+                </select>
+                <input type="text" id="input-busca" placeholder="🔎 Buscar tarefa...">
+            </div>
         </div>
         <form class="form">
             <input type="text" class="tarefa" id="input-tarefa" maxlength="100" placeholder="Insira sua tarefa">

@@ -9,6 +9,7 @@ function app() {
     const btnSalvar   = document.getElementById('btn-salvar');
     const btnCancelar = document.getElementById('btn-cancelar');
     const inputBusca  = document.getElementById('input-busca');
+    const filtroStatus = document.getElementById('filtro-status');
 
 
     let liAtual = null;  // Referência à tarefa sendo editada
@@ -213,6 +214,7 @@ function app() {
             if (icone) icone.remove();
         }
         salvarTarefasNoLocalStorage();
+        aplicarBuscaEFiltro();
     }
 
     function salvarTarefasNoLocalStorage() {
@@ -268,6 +270,25 @@ function app() {
         document.getElementById('modal-info').classList.add('ativo');
     }
 
+    function aplicarBuscaEFiltro() {
+        const termo = inputBusca.value.trim().toLowerCase();
+        const status = filtroStatus.value;
+        const tarefas = document.querySelectorAll('.item-tarefa');
+
+        tarefas.forEach(tarefa => {
+           const texto = tarefa.querySelector('.texto-tarefa').innerText.toLowerCase();
+           const concluida = tarefa.classList.contains('concluida');
+
+           const correspondeTexto = texto.includes(termo);
+           const correspondeStatus = 
+           status === 'todas' ||
+           (status === 'concluidas' && concluida) ||
+           (status === 'pendentes' && !concluida);
+
+           tarefa.style.display = correspondeTexto && correspondeStatus ? 'flex' : 'none';
+        });
+    }
+
     tarefasUl.addEventListener('click', function (e) {
         const botaoApagar = e.target.closest('.apagar');
         const botaoEditar = e.target.closest('.editar');
@@ -298,15 +319,9 @@ function app() {
         }
     });
 
-    inputBusca.addEventListener('input', function() {
-        const termo = this.value.trim().toLowerCase();
-        const tarefas = document.querySelectorAll('.item-tarefa');
+    inputBusca.addEventListener('input', aplicarBuscaEFiltro);
 
-        tarefas.forEach(tarefa => {
-            const texto = tarefa.querySelector('.texto-tarefa').innerText.toLowerCase();
-            tarefa.style.display = texto.includes(termo) ? 'flex' : 'none';
-        });
-    });
+    filtroStatus.addEventListener('change', aplicarBuscaEFiltro);
 
     btnCancelar.addEventListener('click', function () {
         fecharModal();

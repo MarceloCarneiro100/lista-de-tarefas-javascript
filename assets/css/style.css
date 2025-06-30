@@ -37,14 +37,20 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+    flex-wrap: wrap;
 }
 
-#input-busca {
+.filtros {
+    display: flex;
+    gap: 10px;
+}
+
+.filtros select,
+.filtros input {
     padding: 6px 10px;
     border-radius: 4px;
     border: 1px solid #ccc;
     font-size: 1em;
-    width: 230px;
 }
 
 form {
