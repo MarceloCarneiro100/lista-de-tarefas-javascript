@@ -107,7 +107,7 @@ function app() {
            li.insertBefore(icone, li.firstChild); 
         }
         
-        tarefasUl.appendChild(li);
+        tarefasUl.insertBefore(li, tarefasUl.firstChild);
         return li;
     }
 
@@ -225,7 +225,7 @@ function app() {
 
     function carregaTarefasDoLocalStorage() {
          const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
-         tarefas.forEach(montaTarefa);
+         tarefas.reverse().forEach(montaTarefa);
     }
 
     // Cria uma tarefa ao pressionar a tecla ENTER na caixa de texto
