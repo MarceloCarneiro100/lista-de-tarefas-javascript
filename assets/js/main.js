@@ -8,6 +8,8 @@ function app() {
     const modal       = document.getElementById('modal-editar');
     const btnSalvar   = document.getElementById('btn-salvar');
     const btnCancelar = document.getElementById('btn-cancelar');
+    const inputBusca  = document.getElementById('input-busca');
+
 
     let liAtual = null;  // Referência à tarefa sendo editada
 
@@ -294,6 +296,16 @@ function app() {
         if (e.code === 'Enter' || e.key == 'Enter') {
             salvaEdicaoModal();
         }
+    });
+
+    inputBusca.addEventListener('input', function() {
+        const termo = this.value.trim().toLowerCase();
+        const tarefas = document.querySelectorAll('.item-tarefa');
+
+        tarefas.forEach(tarefa => {
+            const texto = tarefa.querySelector('.texto-tarefa').innerText.toLowerCase();
+            tarefa.style.display = texto.includes(termo) ? 'flex' : 'none';
+        });
     });
 
     btnCancelar.addEventListener('click', function () {
