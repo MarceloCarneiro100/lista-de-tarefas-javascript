@@ -10,27 +10,38 @@
 </head>
 
 <body>
-
     <section class="container">
         <div class="topo">
             <h1>Lista de tarefas</h1>
             <div class="filtros">
+
                 <select id="filtro-status">
                     <option value="todas">Todas</option>
                     <option value="pendentes">Pendentes</option>
                     <option value="concluidas">Concluídas</option>
                 </select>
+
+                <select id="filtro-prioridade">
+                    <option value="todas">Todas as prioridades</option>
+                    <option value="alta">🔴 Alta</option>
+                    <option value="media">🟡 Média</option>
+                    <option value="baixa">🔵 Baixa</option>
+                </select>
+
                 <input type="text" id="input-busca" placeholder="🔎 Buscar tarefa...">
             </div>
         </div>
         <form class="form">
             <div class="linha-tarefa">
+
                 <input type="text" class="tarefa" id="input-tarefa" maxlength="100" placeholder="Insira sua tarefa">
+
                 <select id="input-prioridade" class="prioridade" title="Selecione uma prioridade">
                     <option value="baixa">🔵 Baixa</option>
                     <option value="media" selected>🟡 Média</option>
                     <option value="alta">🔴 Alta</option>
                 </select>
+
                 <button class="btn" id="btn-tarefa">Enviar</button>
             </div>
         </form>
@@ -43,12 +54,15 @@
             <h2 class="titulo-tarefa">Editar tarefa</h2>
             <hr>
             <input type="text" id="input-edicao" maxlength="100" placeholder="Edite sua tarefa">
+            
             <label for="select-edicao-prioridade">Prioridade:</label>
+
             <select id="select-edicao-prioridade">
                 <option value="baixa">🔵 Baixa</option>
                 <option value="media">🟡 Média</option>
                 <option value="alta">🔴 Alta</option>
             </select>
+
             <div class="botoes-modal">
                 <button id="btn-salvar">Salvar</button>
                 <button id="btn-cancelar">Cancelar</button>
@@ -66,6 +80,7 @@
             <div class="info-conclusao"></div>
             <div class="info-duracao"></div>
             <div class="info-prioridade"></div>
+
             <div class="botoes-modal">
                 <button id="btn-cancelar-info">Cancelar</button>
             </div>

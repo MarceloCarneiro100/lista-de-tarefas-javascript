@@ -12,6 +12,7 @@ function app() {
     const filtroStatus = document.getElementById('filtro-status');
     const inputPrioridade = document.getElementById('input-prioridade');
     const selectEdicaoPrioridade = document.getElementById('select-edicao-prioridade');
+    const filtroPrioridade =  document.getElementById('filtro-prioridade');
 
     const nomesPrioridades = {
         baixa: 'Baixa',
@@ -195,6 +196,7 @@ function app() {
             }
 
             salvarTarefasNoLocalStorage();
+            aplicarBuscaEFiltro();
             fecharModal();
         }
     }
@@ -309,11 +311,14 @@ function app() {
     function aplicarBuscaEFiltro() {
         const termo = inputBusca.value.trim().toLowerCase();
         const status = filtroStatus.value;
+        const prioridadeSelecionada = filtroPrioridade.value;
+
         const tarefas = document.querySelectorAll('.item-tarefa');
 
         tarefas.forEach(tarefa => {
             const texto = tarefa.querySelector('.texto-tarefa').innerText.toLowerCase();
             const concluida = tarefa.classList.contains('concluida');
+            const prioridade = tarefa.getAttribute('data-prioridade');
 
             const correspondeTexto = texto.includes(termo);
             const correspondeStatus =
@@ -321,7 +326,10 @@ function app() {
                 (status === 'concluidas' && concluida) ||
                 (status === 'pendentes' && !concluida);
 
-            tarefa.style.display = correspondeTexto && correspondeStatus ? 'flex' : 'none';
+            const correspondePrioridade = prioridadeSelecionada === 'todas' || prioridadeSelecionada === prioridade;
+
+            tarefa.style.display = correspondeTexto && correspondeStatus && correspondePrioridade 
+            ? 'flex' : 'none';
         });
     }
 
@@ -355,9 +363,10 @@ function app() {
         }
     });
 
+    filtroStatus.addEventListener('change', aplicarBuscaEFiltro);
+    filtroPrioridade.addEventListener('change', aplicarBuscaEFiltro);
     inputBusca.addEventListener('input', aplicarBuscaEFiltro);
 
-    filtroStatus.addEventListener('change', aplicarBuscaEFiltro);
 
     btnCancelar.addEventListener('click', function () {
         fecharModal();
