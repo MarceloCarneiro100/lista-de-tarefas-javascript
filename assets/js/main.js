@@ -5,14 +5,17 @@ function app() {
     const btn         = formulario.querySelector('.btn');
     const tarefasUl   = document.querySelector('.tarefas');
     const inputEdicao = document.getElementById('input-edicao');
-    const modal       = document.getElementById('modal-editar');
     const btnSalvar   = document.getElementById('btn-salvar');
     const btnCancelar = document.getElementById('btn-cancelar');
     const inputBusca  = document.getElementById('input-busca');
     const filtroStatus = document.getElementById('filtro-status');
     const inputPrioridade = document.getElementById('input-prioridade');
     const selectEdicaoPrioridade = document.getElementById('select-edicao-prioridade');
-    const filtroPrioridade =  document.getElementById('filtro-prioridade');
+    const filtroPrioridade = document.getElementById('filtro-prioridade');
+    const btnExportar = document.getElementById('btn-exportar');
+    const inputImportar = document.getElementById('input-importar');
+
+    let tarefasImportadasTemporarias = [];
 
     const nomesPrioridades = {
         baixa: 'Baixa',
@@ -148,11 +151,11 @@ function app() {
         salvarTarefasNoLocalStorage();
     }
 
-    function abrirModal() {
+    function abrirModal(modal) {
         modal.classList.add('ativo');
     }
 
-    function fecharModal() {
+    function fecharModal(modal) {
         modal.classList.remove('ativo');
         liAtual = null;
     }
@@ -168,7 +171,8 @@ function app() {
         const prioridade = liAtual.getAttribute('data-prioridade') || 'media';
         selectEdicaoPrioridade.value = prioridade;
 
-        abrirModal();
+        const modal = document.getElementById('modal-editar');
+        abrirModal(modal);
     }
 
     function salvaEdicaoModal() {
@@ -197,7 +201,9 @@ function app() {
 
             salvarTarefasNoLocalStorage();
             aplicarBuscaEFiltro();
-            fecharModal();
+
+            const modal = document.getElementById('modal-editar');
+            fecharModal(modal);
         }
     }
 
@@ -328,8 +334,8 @@ function app() {
 
             const correspondePrioridade = prioridadeSelecionada === 'todas' || prioridadeSelecionada === prioridade;
 
-            tarefa.style.display = correspondeTexto && correspondeStatus && correspondePrioridade 
-            ? 'flex' : 'none';
+            tarefa.style.display = correspondeTexto && correspondeStatus && correspondePrioridade
+                ? 'flex' : 'none';
         });
     }
 
@@ -369,7 +375,51 @@ function app() {
 
 
     btnCancelar.addEventListener('click', function () {
-        fecharModal();
+        const modal = document.getElementById('modal-editar');
+        fecharModal(modal);
+    });
+
+    btnExportar.addEventListener('click', () => {
+        const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
+        const json = JSON.stringify(tarefas, null, 2);
+        const blob = new Blob([json], { type: 'application/octet-stream' });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'tarefas.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+
+    inputImportar.addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                const tarefas = JSON.parse(e.target.result);
+                if (!Array.isArray(tarefas)) throw new Error('Formato inválido');
+
+                tarefasImportadasTemporarias = tarefas;
+                const modal = document.getElementById('modal-confirmar-importacao');
+                abrirModal(modal);
+
+            } catch (err) {
+                alert('Erro ao importar tarefas. Verifique o conteúdo do arquivo JSON.');
+            }
+        };
+        reader.readAsText(file);
+        inputImportar.value = '';
+
+    });
+
+    document.getElementById('btn-confirmar-importacao').addEventListener('click', () => {
+        localStorage.setItem('tarefas', JSON.stringify(tarefasImportadasTemporarias));
+        location.reload();
     });
 
     function registrarFechamentoModal(idModal, idBotaoFechar) {
@@ -378,7 +428,8 @@ function app() {
 
         if (botao && modal) {
             botao.addEventListener('click', () => {
-                modal.classList.remove('ativo');
+                // modal.classList.remove('ativo');
+                fecharModal(modal);
             });
         }
     }
@@ -387,6 +438,8 @@ function app() {
     registrarFechamentoModal('modal-editar', 'btn-cancelar');
     registrarFechamentoModal('modal-info', 'btn-fechar-info');
     registrarFechamentoModal('modal-info', 'btn-cancelar-info');
+    registrarFechamentoModal('modal-confirmar-importacao', 'btn-cancelar-importacao');
+    registrarFechamentoModal('modal-confirmar-importacao', 'fechar-modal-importar');
 
     carregaTarefasDoLocalStorage();
 }

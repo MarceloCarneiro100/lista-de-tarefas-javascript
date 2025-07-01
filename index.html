@@ -45,6 +45,13 @@
                 <button class="btn" id="btn-tarefa">Enviar</button>
             </div>
         </form>
+        <div class="acoes-json">
+            <button id="btn-exportar" title="Exportar tarefas como JSON">⬇️</button>
+            <label for="input-importar" title="Importar tarefas em JSON">
+                ⬆️
+                <input type="file" id="input-importar" accept=".json">
+            </label>
+        </div>
         <ul class="tarefas"></ul>
     </section>
 
@@ -54,7 +61,7 @@
             <h2 class="titulo-tarefa">Editar tarefa</h2>
             <hr>
             <input type="text" id="input-edicao" maxlength="100" placeholder="Edite sua tarefa">
-            
+
             <label for="select-edicao-prioridade">Prioridade:</label>
 
             <select id="select-edicao-prioridade">
@@ -83,6 +90,19 @@
 
             <div class="botoes-modal">
                 <button id="btn-cancelar-info">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-confirmar-importacao">
+        <div class="modal-conteudo">
+            <button id="fechar-modal-importar" class="fechar-modal" title="Fechar confirmação">&times;</button>
+            <h2>Substituir tarefas?</h2>
+            <hr>
+            <p>Isso apagará todas as tarefas atuais e carregará as tarefas do arquivo selecionado.</p>
+            <div class="botoes-modal">
+                <button id="btn-confirmar-importacao">Sim, substituir</button>
+                <button id="btn-cancelar-importacao">Cancelar</button>
             </div>
         </div>
     </div>
