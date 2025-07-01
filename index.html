@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de tarefas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
     <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 
@@ -25,8 +24,15 @@
             </div>
         </div>
         <form class="form">
-            <input type="text" class="tarefa" id="input-tarefa" maxlength="100" placeholder="Insira sua tarefa">
-            <button class="btn" id="btn-tarefa">Enviar</button>
+            <div class="linha-tarefa">
+                <input type="text" class="tarefa" id="input-tarefa" maxlength="100" placeholder="Insira sua tarefa">
+                <select id="input-prioridade" class="prioridade" title="Selecione uma prioridade">
+                    <option value="baixa">🔵 Baixa</option>
+                    <option value="media" selected>🟡 Média</option>
+                    <option value="alta">🔴 Alta</option>
+                </select>
+                <button class="btn" id="btn-tarefa">Enviar</button>
+            </div>
         </form>
         <ul class="tarefas"></ul>
     </section>
@@ -37,7 +43,12 @@
             <h2 class="titulo-tarefa">Editar tarefa</h2>
             <hr>
             <input type="text" id="input-edicao" maxlength="100" placeholder="Edite sua tarefa">
-            <div class="data-criacao"></div>
+            <label for="select-edicao-prioridade">Prioridade:</label>
+            <select id="select-edicao-prioridade">
+                <option value="baixa">🔵 Baixa</option>
+                <option value="media">🟡 Média</option>
+                <option value="alta">🔴 Alta</option>
+            </select>
             <div class="botoes-modal">
                 <button id="btn-salvar">Salvar</button>
                 <button id="btn-cancelar">Cancelar</button>
@@ -54,6 +65,7 @@
             <div class="info-criacao"></div>
             <div class="info-conclusao"></div>
             <div class="info-duracao"></div>
+            <div class="info-prioridade"></div>
             <div class="botoes-modal">
                 <button id="btn-cancelar-info">Cancelar</button>
             </div>

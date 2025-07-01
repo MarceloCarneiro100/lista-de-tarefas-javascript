@@ -10,13 +10,27 @@ function app() {
     const btnCancelar = document.getElementById('btn-cancelar');
     const inputBusca  = document.getElementById('input-busca');
     const filtroStatus = document.getElementById('filtro-status');
+    const inputPrioridade = document.getElementById('input-prioridade');
+    const selectEdicaoPrioridade = document.getElementById('select-edicao-prioridade');
 
+    const nomesPrioridades = {
+        baixa: 'Baixa',
+        media: 'Média',
+        alta: 'Alta'
+    }
 
     let liAtual = null;  // Referência à tarefa sendo editada
 
     function criaLi() {
         const li = document.createElement('li');
         return li;
+    }
+
+    function criaBolinhaPrioridade(nivel) {
+        const bolinha = document.createElement('span');
+        bolinha.classList.add('bolinha-prioridade', nivel);
+        bolinha.title = `Prioridade: ${nomesPrioridades[nivel]}`;
+        return bolinha;
     }
 
     function criaContainerBotoes() {
@@ -55,11 +69,11 @@ function app() {
     }
 
     function criaBotaoDetalhar(container) {
-         const botao = document.createElement('button');
-         botao.className = 'detalhar';
-         botao.title = 'Ver detalhes da tarefa';
-         botao.innerHTML = '<i class="fas fa-info-circle"></i>';
-         container.appendChild(botao);
+        const botao = document.createElement('button');
+        botao.className = 'detalhar';
+        botao.title = 'Ver detalhes da tarefa';
+        botao.innerHTML = '<i class="fas fa-info-circle"></i>';
+        container.appendChild(botao);
     }
 
     function limparCampo() {
@@ -74,25 +88,26 @@ function app() {
         return badge;
     }
 
-    function montaTarefa({ texto, concluida, criacao, conclusao }) {
-         const li = criaLi();
-         li.classList.add('item-tarefa');
-         if (concluida) li.classList.add('concluida');
-         li.setAttribute('data-criacao', criacao);
-         if (conclusao) li.setAttribute('data-conclusao', conclusao);
+    function montaTarefa({ texto, prioridade, concluida, criacao, conclusao }) {
+        const li = criaLi();
+        li.setAttribute('data-prioridade', prioridade);
 
-         // texto
-         const span = document.createElement('span');
-         span.className = 'texto-tarefa';
-         span.innerText = texto;
-         span.title = concluida 
+        li.classList.add('item-tarefa');
+        if (concluida) li.classList.add('concluida');
+        li.setAttribute('data-criacao', criacao);
+        if (conclusao) li.setAttribute('data-conclusao', conclusao);
+
+        // texto
+        const span = document.createElement('span');
+        span.className = 'texto-tarefa';
+        span.innerText = texto;
+        span.title = concluida
             ? 'Clique para reabrir a tarefa'
             : 'Clique para marcar como concluída';
 
         span.classList.add('animada');
         setTimeout(() => span.classList.remove('animada'), 300);
 
-        
         li.appendChild(span);
 
         // badge, botões, ícones, etc
@@ -103,23 +118,28 @@ function app() {
         li.appendChild(containerBotoes);
 
         if (concluida) {
-           const icone = document.createElement('i');
-           icone.classList.add('fas', 'fa-check-circle', 'icone-check');
-           icone.style.color = 'green';
-           icone.style.marginRight = '8px';
-           li.insertBefore(icone, li.firstChild); 
+            const icone = document.createElement('i');
+            icone.classList.add('fas', 'fa-check-circle', 'icone-check');
+            icone.style.color = 'green';
+            icone.style.marginRight = '8px';
+            li.insertBefore(icone, li.firstChild);
         }
-        
+
+        const bolinha = criaBolinhaPrioridade(prioridade);
+        li.insertBefore(bolinha, li.firstChild);
+
         tarefasUl.insertBefore(li, tarefasUl.firstChild);
         return li;
     }
 
     function criaTarefas(texto) {
+        const prioridade = inputPrioridade.value;
         const tarefa = {
-           texto, 
-           concluida: false,
-           criacao: new Date().toLocaleString('pt-BR'),
-           conclusao: null
+            texto,
+            prioridade,
+            concluida: false,
+            criacao: new Date().toLocaleString('pt-BR'),
+            conclusao: null
         };
 
         montaTarefa(tarefa);
@@ -144,6 +164,9 @@ function app() {
         const texto = liAtual.querySelector('.texto-tarefa');
         inputEdicao.value = texto.innerText;
 
+        const prioridade = liAtual.getAttribute('data-prioridade') || 'media';
+        selectEdicaoPrioridade.value = prioridade;
+
         abrirModal();
     }
 
@@ -161,6 +184,15 @@ function app() {
             // Efeito visual após salvar
             texto.classList.add('animada');
             setTimeout(() => texto.classList.remove('animada'), 300);
+
+            const novaPrioridade = selectEdicaoPrioridade.value;
+            liAtual.setAttribute('data-prioridade', novaPrioridade);
+
+            const bolinha = liAtual.querySelector('.bolinha-prioridade');
+            if (bolinha) {
+                bolinha.className = `bolinha-prioridade ${novaPrioridade}`;
+                bolinha.title = `Prioridade: ${nomesPrioridades[novaPrioridade]}`;
+            }
 
             salvarTarefasNoLocalStorage();
             fecharModal();
@@ -220,16 +252,17 @@ function app() {
     function salvarTarefasNoLocalStorage() {
         const tarefas = [...document.querySelectorAll('.item-tarefa')].map(li => ({
             texto: li.querySelector('.texto-tarefa').innerText,
+            prioridade: li.getAttribute('data-prioridade') || 'media',
             concluida: li.classList.contains('concluida'),
             criacao: li.getAttribute('data-criacao'),
-            conclusao: li.getAttribute('data-conclusao')
+            conclusao: li.getAttribute('data-conclusao') || null
         }));
         localStorage.setItem('tarefas', JSON.stringify(tarefas));
     }
 
     function carregaTarefasDoLocalStorage() {
-         const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
-         tarefas.reverse().forEach(montaTarefa);
+        const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
+        tarefas.reverse().forEach(montaTarefa);
     }
 
     // Cria uma tarefa ao pressionar a tecla ENTER na caixa de texto
@@ -250,17 +283,20 @@ function app() {
 
     function obterInfoTarefa(li) {
         const tarefa = li.querySelector('.texto-tarefa').innerText;
+        const prioridade = li.getAttribute('data-prioridade');
         const criacao = li.getAttribute('data-criacao') || '---';
         const conclusao = li.getAttribute('data-conclusao') || '---';
         const duracao = li.getAttribute('data-conclusao')
             ? calcularDuracaoComDayjs(criacao, conclusao)
             : '---';
-        return { tarefa, criacao, conclusao, duracao };
+        return { tarefa, prioridade, criacao, conclusao, duracao };
     }
 
-    function renderizarInfoModal({ tarefa, criacao, conclusao, duracao }) {
-        document.querySelector('#modal-info .info-tarefa').innerHTML = 
-        `<p><em>${tarefa}</em></p>`
+    function renderizarInfoModal({ tarefa, prioridade, criacao, conclusao, duracao }) {
+        document.querySelector('#modal-info .info-tarefa').innerHTML =
+            `<p><em>${tarefa}</em></p>`;
+        document.querySelector('#modal-info .info-prioridade').innerHTML =
+            `<p><strong>🔥 Prioridade: </strong><span class="prioridade-texto ${prioridade}">${nomesPrioridades[prioridade]}</span></p>`
         document.querySelector('#modal-info .info-criacao').innerHTML =
             `<p><strong>📅 Criada:</strong> ${criacao}</p>`;
         document.querySelector('#modal-info .info-conclusao').innerHTML =
@@ -276,16 +312,16 @@ function app() {
         const tarefas = document.querySelectorAll('.item-tarefa');
 
         tarefas.forEach(tarefa => {
-           const texto = tarefa.querySelector('.texto-tarefa').innerText.toLowerCase();
-           const concluida = tarefa.classList.contains('concluida');
+            const texto = tarefa.querySelector('.texto-tarefa').innerText.toLowerCase();
+            const concluida = tarefa.classList.contains('concluida');
 
-           const correspondeTexto = texto.includes(termo);
-           const correspondeStatus = 
-           status === 'todas' ||
-           (status === 'concluidas' && concluida) ||
-           (status === 'pendentes' && !concluida);
+            const correspondeTexto = texto.includes(termo);
+            const correspondeStatus =
+                status === 'todas' ||
+                (status === 'concluidas' && concluida) ||
+                (status === 'pendentes' && !concluida);
 
-           tarefa.style.display = correspondeTexto && correspondeStatus ? 'flex' : 'none';
+            tarefa.style.display = correspondeTexto && correspondeStatus ? 'flex' : 'none';
         });
     }
 

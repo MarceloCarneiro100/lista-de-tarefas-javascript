@@ -6,7 +6,7 @@
     --danger-color: rgb(206, 71, 71);
     --secondary-color: rgb(77, 75, 75);
     --alert-color: rgb(192, 128, 55);
-    --info-color:  #007ACC;
+    --info-color: #007ACC;
 }
 
 * {
@@ -55,31 +55,23 @@ body {
 
 form {
     display: flex;
+    flex-direction: column;
     align-items: center;
     margin-bottom: 30px;
     border-bottom: 1px solid #ddd;
     padding-bottom: 20px;
+    gap: 10px;
 }
 
-form input,
-form label,
-form button {
-    display: block;
-    width: 100%;
-    margin-bottom: 10px;
-}
 
 form input {
     font-size: 1.2em;
     height: 50px;
-    padding: 0 20px;
+    padding: 6px 10px;
     flex: 1;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
-}
-
-form input:focus {
-    outline: 1px solid var(--primary-color)
+    margin-bottom: 10px;
 }
 
 form button {
@@ -99,13 +91,79 @@ form button {
     transition: background-color 0.3s ease;
 }
 
-
 form button:hover {
     background: var(--primary-color-darker);
 }
 
 form button:active {
     background: red;
+}
+
+.linha-tarefa {
+    display: flex;
+    width: 100%;
+}
+
+.linha-tarefa input.tarefa {
+    flex: 1;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    font-size: 1.2em;
+    height: 50px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-right: none;
+}
+
+select.prioridade {
+    height: 50px;
+    border: 1px solid #ccc;
+    border-left: none;
+    border-right: none;
+    font-size: 1em;
+    padding: 0 10px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.linha-tarefa .btn {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    height: 50px;
+    padding: 0 20px;
+    font-size: 18px;
+    font-weight: 700;
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.linha-tarefa .btn:hover {
+    background: var(--primary-color-darker);
+}
+
+/* Bolinha de prioridade */
+.bolinha-prioridade {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.bolinha-prioridade.alta {
+    background-color: #e74c3c;
+}
+
+.bolinha-prioridade.media {
+    background-color: #f1c40f;
+}
+
+.bolinha-prioridade.baixa {
+    background-color: #3498db;
 }
 
 .tarefas {
@@ -139,6 +197,25 @@ form button:active {
     color: #2d662f;
 }
 
+.item-tarefa.concluida .bolinha-prioridade {
+    display: none;
+}
+
+.prioridade-texto.alta {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.prioridade-texto.media {
+    color: #f1c40f;
+    font-weight: bold;
+}
+
+.prioridade-texto.baixa {
+    color: #3498db;
+    font-weight: bold;
+}
+
 .texto-tarefa {
     flex: 1;
     word-break: break-word;
@@ -147,13 +224,21 @@ form button:active {
 }
 
 .texto-tarefa.animada {
-  animation: pulse 0.3s ease-in-out;
+    animation: pulse 0.3s ease-in-out;
 }
 
 @keyframes pulse {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.05); }
-  100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 .item-tarefa.concluida .badge {
@@ -193,7 +278,7 @@ form button:active {
     border-radius: 12px;
     font-size: 0.75rem;
     margin-left: 10px;
-    margin-right: 15px; 
+    margin-right: 15px;
     opacity: 0;
     transition: opacity 0.6s ease;
 }
@@ -230,7 +315,7 @@ form button:active {
 }
 
 .editar i,
-.apagar i, 
+.apagar i,
 .detalhar i {
     font-size: 15px;
 }
@@ -295,6 +380,12 @@ form button:active {
     font-size: 24px;
     height: 50px;
     padding: 0 20px;
+    margin-bottom: 20px;
+}
+
+.modal #select-edicao-prioridade {
+    font-size: 18px;
+    padding: 5px;
 }
 
 #modal-info .info-tarefa {
@@ -362,7 +453,7 @@ form button:active {
 }
 
 @media (hover: none) {
-  .item-tarefa.concluida .detalhar {
-    opacity: 1;
-  }
+    .item-tarefa.concluida .detalhar {
+        opacity: 1;
+    }
 }
