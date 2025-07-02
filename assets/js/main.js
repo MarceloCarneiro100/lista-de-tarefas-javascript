@@ -434,6 +434,15 @@ function app() {
         }
     }
 
+    window.addEventListener('scroll', () => {
+         const botaoTopo = document.getElementById('btn-topo');
+         botaoTopo.style.display = window.scrollY > 200 ? 'block' : 'none';
+    });
+
+    document.getElementById('btn-topo').addEventListener('click', () => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
     registrarFechamentoModal('modal-editar', 'btn-fechar-edicao');
     registrarFechamentoModal('modal-editar', 'btn-cancelar');
     registrarFechamentoModal('modal-info', 'btn-fechar-info');

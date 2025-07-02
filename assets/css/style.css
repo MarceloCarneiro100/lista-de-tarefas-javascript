@@ -494,6 +494,26 @@ select.prioridade {
     background: var(--primary-color-darker);
 }
 
+#btn-topo {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    padding: 10px 14px;
+    cursor: pointer;
+    display: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+}
+
+#btn-topo {
+    background: var(--primary-color-darker);
+}
+
 @media (hover: none) {
     .item-tarefa.concluida .detalhar {
         opacity: 1;
