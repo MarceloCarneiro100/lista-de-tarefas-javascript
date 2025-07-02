@@ -12,7 +12,16 @@
 <body>
     <section class="container">
         <div class="topo">
-            <h1>Lista de tarefas</h1>
+            <div class="acoes">
+                <h1>Lista de tarefas</h1>
+                <div class="acoes-json">
+                    <button id="btn-exportar" title="Exportar tarefas como JSON">⬇️</button>
+                    <label for="input-importar" title="Importar tarefas em JSON">
+                        ⬆️
+                        <input type="file" id="input-importar" accept=".json">
+                    </label>
+                </div>
+            </div>
             <div class="filtros">
 
                 <select id="filtro-status">
@@ -45,14 +54,10 @@
                 <button class="btn" id="btn-tarefa">Enviar</button>
             </div>
         </form>
-        <div class="acoes-json">
-            <button id="btn-exportar" title="Exportar tarefas como JSON">⬇️</button>
-            <label for="input-importar" title="Importar tarefas em JSON">
-                ⬆️
-                <input type="file" id="input-importar" accept=".json">
-            </label>
-        </div>
+        <div id="resumo-tarefas" class="resumo-tarefas"></div>
         <ul class="tarefas"></ul>
+        <div id="paginacao" class="paginacao"></div>
+
     </section>
 
     <div class="modal" id="modal-editar">

@@ -1,13 +1,13 @@
 
 function app() {
-    const formulario  = document.querySelector('.form');
+    const formulario = document.querySelector('.form');
     const inputTarefa = formulario.querySelector('.tarefa');
-    const btn         = formulario.querySelector('.btn');
-    const tarefasUl   = document.querySelector('.tarefas');
+    const btn = formulario.querySelector('.btn');
+    const tarefasUl = document.querySelector('.tarefas');
     const inputEdicao = document.getElementById('input-edicao');
-    const btnSalvar   = document.getElementById('btn-salvar');
+    const btnSalvar = document.getElementById('btn-salvar');
     const btnCancelar = document.getElementById('btn-cancelar');
-    const inputBusca  = document.getElementById('input-busca');
+    const inputBusca = document.getElementById('input-busca');
     const filtroStatus = document.getElementById('filtro-status');
     const inputPrioridade = document.getElementById('input-prioridade');
     const selectEdicaoPrioridade = document.getElementById('select-edicao-prioridade');
@@ -16,6 +16,9 @@ function app() {
     const inputImportar = document.getElementById('input-importar');
 
     let tarefasImportadasTemporarias = [];
+    let paginaAtual = 1;
+    const tarefasPorPagina = 5;
+
 
     const nomesPrioridades = {
         baixa: 'Baixa',
@@ -149,6 +152,7 @@ function app() {
         montaTarefa(tarefa);
         limparCampo();
         salvarTarefasNoLocalStorage();
+        aplicarBuscaEFiltro();
     }
 
     function abrirModal(modal) {
@@ -275,7 +279,7 @@ function app() {
 
     // Cria uma tarefa ao pressionar a tecla ENTER na caixa de texto
     inputTarefa.addEventListener('keypress', function (e) {
-        if (e.keyCode === 13) {
+        if (e.key === 'Enter') {
             const valor = inputTarefa.value.trim();
             if (!valor) return;
             criaTarefas(valor);
@@ -334,9 +338,72 @@ function app() {
 
             const correspondePrioridade = prioridadeSelecionada === 'todas' || prioridadeSelecionada === prioridade;
 
-            tarefa.style.display = correspondeTexto && correspondeStatus && correspondePrioridade
-                ? 'flex' : 'none';
+            const deveExibir = correspondeTexto && correspondeStatus && correspondePrioridade;
+            tarefa.style.display = deveExibir ? 'flex' : 'none';
         });
+
+        paginaAtual = 1;
+        renderizarTarefasComPaginacao();
+        atualizarResumoTarefas();
+    }
+
+    function renderizarTarefasComPaginacao() {
+        const todas = [...document.querySelectorAll('.item-tarefa')];
+        const tarefasVisiveis = todas.filter(el => el.style.display !== 'none');
+
+        const total = tarefasVisiveis.length;
+        const totalPaginas = Math.ceil(total / tarefasPorPagina);
+        if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+
+        tarefasUl.querySelectorAll('.item-tarefa').forEach(el => el.classList.add('oculta'));
+
+        const inicio = (paginaAtual - 1) * tarefasPorPagina;
+        const fim = inicio + tarefasPorPagina;
+
+        tarefasVisiveis.slice(inicio, fim).forEach(el => el.classList.remove('oculta'));
+
+        renderizarControlesDePaginacao(totalPaginas);
+    }
+
+    function renderizarControlesDePaginacao(totalPaginas) {
+        const paginacaoDiv = document.getElementById('paginacao');
+        paginacaoDiv.innerHTML = '';
+
+        if (totalPaginas <= 1) return;
+
+        const botoes = [
+            { texto: '⏮ Início', ativo: paginaAtual > 1, acao: () => paginaAtual = 1 },
+            { texto: '◀ Anterior', ativo: paginaAtual > 1, acao: () => paginaAtual-- },
+            { texto: 'Próxima ▶', ativo: paginaAtual < totalPaginas, acao: () => paginaAtual++ },
+            { texto: 'Fim ⏭', ativo: paginaAtual < totalPaginas, acao: () => paginaAtual = totalPaginas },
+        ];
+
+        botoes.forEach(({ texto, ativo, acao }) => {
+            const btn = document.createElement('button');
+            btn.textContent = texto;
+            btn.disabled = !ativo;
+            btn.addEventListener('click', () => {
+                acao();
+                renderizarTarefasComPaginacao();
+            });
+            paginacaoDiv.appendChild(btn);
+        });
+
+        const status = document.createElement('span');
+        status.className = 'status';
+        status.textContent = `Página ${paginaAtual} de ${totalPaginas}`;
+        paginacaoDiv.appendChild(status);
+    }
+
+    function atualizarResumoTarefas() {
+        const todas = document.querySelectorAll('.item-tarefa');
+        const visiveis = Array.from(todas).filter(t => t.style.display !== 'none');
+
+        const resumo = document.getElementById('resumo-tarefas');
+        resumo.textContent = visiveis.length === 1
+            ? `🔎 1 tarefa encontrada`
+            : `🔎 ${visiveis.length} tarefas encontradas`;
+
     }
 
     tarefasUl.addEventListener('click', function (e) {
@@ -350,6 +417,7 @@ function app() {
         if (botaoApagar) {
             item.remove();
             salvarTarefasNoLocalStorage();
+            aplicarBuscaEFiltro();
         } else if (botaoEditar) {
             editaTarefas(e);
         } else if (botaoDetalhar) {
@@ -428,19 +496,18 @@ function app() {
 
         if (botao && modal) {
             botao.addEventListener('click', () => {
-                // modal.classList.remove('ativo');
                 fecharModal(modal);
             });
         }
     }
 
     window.addEventListener('scroll', () => {
-         const botaoTopo = document.getElementById('btn-topo');
-         botaoTopo.style.display = window.scrollY > 200 ? 'block' : 'none';
+        const botaoTopo = document.getElementById('btn-topo');
+        botaoTopo.style.display = window.scrollY > 200 ? 'block' : 'none';
     });
 
     document.getElementById('btn-topo').addEventListener('click', () => {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
     registrarFechamentoModal('modal-editar', 'btn-fechar-edicao');
@@ -451,6 +518,7 @@ function app() {
     registrarFechamentoModal('modal-confirmar-importacao', 'fechar-modal-importar');
 
     carregaTarefasDoLocalStorage();
+    aplicarBuscaEFiltro();
 }
 
 app();
