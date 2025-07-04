@@ -65,7 +65,11 @@
                 <button class="btn" id="btn-tarefa">Enviar</button>
             </div>
         </form>
-        <div id="resumo-tarefas" class="resumo-tarefas"></div>
+        <div id="resumo-tarefas" class="resumo-tarefas">
+            🔎 <span id="contador-tarefas">x tarefas encontradas</span>
+            <button id="btn-relatorio-pdf" title="Gerar relatório em PDF">📄 Gerar PDF</button>
+        </div>
+
         <ul class="tarefas"></ul>
         <div id="paginacao" class="paginacao"></div>
 
@@ -137,6 +141,12 @@
         dayjs.locale('pt-br');
     </script>
     <script src="./assets/js/utils/funcoesTempo.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script>
+        Chart.register(ChartDataLabels);
+    </script>
     <script src="./assets/js/main.js"></script>
 </body>
 

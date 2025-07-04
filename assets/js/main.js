@@ -94,7 +94,7 @@ function app() {
         return badge;
     }
 
-    function montaTarefa({ texto, prioridade, concluida, criacao, conclusao }) {
+    function montaTarefa({ texto, prioridade, concluida, criacao, conclusao, duracao }) {
         const li = criaLi();
         li.setAttribute('data-prioridade', prioridade);
 
@@ -102,6 +102,7 @@ function app() {
         if (concluida) li.classList.add('concluida');
         li.setAttribute('data-criacao', criacao);
         if (conclusao) li.setAttribute('data-conclusao', conclusao);
+        if (duracao) li.setAttribute('data-duracao', duracao);
 
         // texto
         const span = document.createElement('span');
@@ -266,10 +267,12 @@ function app() {
             prioridade: li.getAttribute('data-prioridade') || 'media',
             concluida: li.classList.contains('concluida'),
             criacao: li.getAttribute('data-criacao'),
-            conclusao: li.getAttribute('data-conclusao') || null
+            conclusao: li.getAttribute('data-conclusao') || null,
+            duracao: li.getAttribute('data-duracao') || null
         }));
         localStorage.setItem('tarefas', JSON.stringify(tarefas));
     }
+
 
     function carregaTarefasDoLocalStorage() {
         const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
@@ -384,6 +387,62 @@ function app() {
         atualizarResumoTarefas();
     }
 
+    function getTodasTarefasFiltradas() {
+        const termo = inputBusca.value.trim().toLowerCase();
+        const status = filtroStatus.value;
+        const prioridadeSelecionada = filtroPrioridade.value;
+        const periodo = document.getElementById('filtro-periodo').value;
+        const todas = [...document.querySelectorAll('.item-tarefa')];
+
+        return todas.filter(tarefa => {
+            const texto = tarefa.querySelector('.texto-tarefa').innerText.toLowerCase();
+            const concluida = tarefa.classList.contains('concluida');
+            const prioridade = tarefa.getAttribute('data-prioridade');
+
+            const correspondeTexto = texto.includes(termo);
+            const correspondeStatus =
+                status === 'todas' ||
+                (status === 'concluidas' && concluida) ||
+                (status === 'pendentes' && !concluida);
+
+            const correspondePrioridade =
+                prioridadeSelecionada === 'todas' || prioridadeSelecionada === prioridade;
+
+            const dataCriacao = tarefa.getAttribute('data-criacao')?.trim();
+            const dataConclusao = tarefa.getAttribute('data-conclusao')?.trim();
+            const criadaEm = dayjs(dataCriacao, 'DD/MM/YYYY HH:mm:ss');
+            const concluidaEm = dataConclusao
+                ? dayjs(dataConclusao, 'DD/MM/YYYY HH:mm:ss')
+                : null;
+
+            const dataRef = tarefa.classList.contains('concluida') ? concluidaEm : criadaEm;
+            const hoje = dayjs().format('YYYY-MM-DD');
+            const dataEhValida = dataRef?.isValid?.();
+            const dataFormatada = dataRef?.format?.('YYYY-MM-DD');
+            const correspondeHoje = dataFormatada === hoje;
+            const corresponde7dias = dayjs().diff(dataRef, 'day') <= 7;
+            const corresponde30dias = dayjs().diff(dataRef, 'day') <= 30;
+
+            const correspondeData = (() => {
+                if (!dataRef || !dataEhValida) return false;
+                if (periodo === 'todas') return true;
+                if (periodo === 'hoje') return correspondeHoje;
+                if (periodo === '7dias') return corresponde7dias;
+                if (periodo === '30dias') return corresponde30dias;
+                return true;
+            })();
+
+            return correspondeTexto && correspondeStatus && correspondePrioridade && correspondeData;
+        }).map(li => ({
+            texto: li.querySelector('.texto-tarefa').innerText,
+            prioridade: li.getAttribute('data-prioridade'),
+            concluida: li.classList.contains('concluida'),
+            criacao: li.getAttribute('data-criacao'),
+            conclusao: li.getAttribute('data-conclusao'),
+            duracao: li.getAttribute('data-duracao') || null
+        }));
+    }
+
     function renderizarTarefasComPaginacao() {
         const todas = [...document.querySelectorAll('.item-tarefa')];
         const tarefasVisiveis = todas.filter(el => el.style.display !== 'none');
@@ -436,10 +495,10 @@ function app() {
         const todas = document.querySelectorAll('.item-tarefa');
         const visiveis = Array.from(todas).filter(t => t.style.display !== 'none');
 
-        const resumo = document.getElementById('resumo-tarefas');
-        resumo.textContent = visiveis.length === 1
-            ? `🔎 1 tarefa encontrada`
-            : `🔎 ${visiveis.length} tarefas encontradas`;
+        document.getElementById('contador-tarefas').textContent =
+            visiveis.length === 1
+                ? `1 tarefa encontrada`
+                : `${visiveis.length} tarefas encontradas`;
 
     }
 
@@ -559,6 +618,177 @@ function app() {
 
     carregaTarefasDoLocalStorage();
     aplicarBuscaEFiltro();
+
+    // Plugin de rótulo de dados para o gráfico
+    Chart.register(ChartDataLabels);
+
+    document.getElementById('btn-relatorio-pdf').addEventListener('click', async () => {
+        const tarefas = getTodasTarefasFiltradas();
+        if (tarefas.length === 0) {
+            alert('Nenhuma tarefa encontrada para gerar o relatório.');
+            return;
+        }
+
+        const filtros = {
+            busca: inputBusca.value,
+            status: filtroStatus.value,
+            prioridade: filtroPrioridade.value,
+            periodo: document.getElementById('filtro-periodo').value
+        };
+
+        function calcularEstatisticas(tarefas) {
+            return {
+                total: tarefas.length,
+                concluidas: tarefas.filter(t => t.concluida).length,
+                pendentes: tarefas.filter(t => !t.concluida).length,
+                porPrioridade: {
+                    alta: tarefas.filter(t => t.prioridade === 'alta').length,
+                    media: tarefas.filter(t => t.prioridade === 'media').length,
+                    baixa: tarefas.filter(t => t.prioridade === 'baixa').length
+                }
+            };
+        }
+
+        const estatisticas = calcularEstatisticas(tarefas);
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFont("courier", "bold");
+        doc.setFontSize(12);
+        doc.text("RELATÓRIO DE TAREFAS", 14, 20);
+        doc.setFont("courier", "normal");
+
+        let y = 30;
+        doc.setFontSize(12);
+        doc.text(`Data: ${new Date().toLocaleString('pt-BR')}`, 14, y);
+        y += 7;
+
+        doc.text(`Filtros:`, 14, y);
+        y += 6;
+        doc.text(`• Busca: "${filtros.busca}"`, 20, y);
+        y += 6;
+        doc.text(`• Status: ${filtros.status}`, 20, y);
+        y += 6;
+        doc.text(`• Prioridade: ${filtros.prioridade}`, 20, y);
+        y += 6;
+        doc.text(`• Período: ${filtros.periodo}`, 20, y);
+
+        y += 10;
+        doc.text(`Estatísticas:`, 14, y);
+        y += 6;
+        doc.text(`• Total: ${estatisticas.total}   • Concluídas: ${estatisticas.concluidas}   • Pendentes: ${estatisticas.pendentes}`, 20, y);
+        y += 6;
+        doc.text(`• Alta: ${estatisticas.porPrioridade.alta}   • Média: ${estatisticas.porPrioridade.media}   • Baixa: ${estatisticas.porPrioridade.baixa}`, 20, y);
+
+        y += 10;
+        doc.setFont("courier", "bold");
+        doc.setFontSize(12);
+        const renderCabecalho = () => {
+            doc.text("Nº | Tarefa                          | Status     | Priorid | Duração", 14, y);
+            y += 5;
+            doc.setFont("courier", "normal");
+            doc.text("---------------------------------------------------------------------", 14, y);
+            y += 5;
+        };
+
+        doc.setFontSize(12);
+        doc.text("TAREFAS FILTRADAS", 14, y);
+        y += 8;
+        doc.setFontSize(12);
+        renderCabecalho();
+
+        tarefas.forEach((t, i) => {
+            const numero = String(i + 1).padStart(2, '0');
+            const texto = t.texto.length > 30
+                ? t.texto.slice(0, 27) + "..."
+                : t.texto.padEnd(30, ' ');
+
+            const status = (t.concluida ? "Concluída" : "Pendente ").padEnd(10, ' ');
+            const prioridade = (t.prioridade || "").padEnd(8, ' ');
+
+            let duracaoFormatada = "--";
+            if (t.concluida && t.duracao && !isNaN(parseInt(t.duracao))) {
+                const ms = parseInt(t.duracao);
+                const segundos = Math.floor(ms / 1000) % 60;
+                const minutos = Math.floor(ms / 60000) % 60;
+                const horas = Math.floor(ms / 3600000) % 24;
+                const dias = Math.floor(ms / 86400000);
+                const partes = [];
+
+                if (dias > 0) partes.push(`${dias}d`);
+                if (horas > 0) partes.push(`${horas}h`);
+                if (minutos > 0) partes.push(`${minutos}min`);
+                if (segundos > 0 && dias === 0 && horas === 0) partes.push(`${segundos}s`);
+
+                duracaoFormatada = partes.join(" ").padEnd(8, ' ');
+            } else {
+                duracaoFormatada = duracaoFormatada.padEnd(8, ' ');
+            }
+
+            const linha = `${numero} | ${texto} | ${status} | ${prioridade} | ${duracaoFormatada}`;
+            doc.text(linha, 14, y);
+            y += 6;
+
+            if (y > 270) {
+                doc.addPage();
+                y = 20;
+                renderCabecalho();
+            }
+        });
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 500;
+        canvas.height = 360;
+        const ctx = canvas.getContext('2d');
+
+        await new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Concluídas', 'Pendentes', 'Alta', 'Média', 'Baixa'],
+                datasets: [{
+                    label: 'Estatísticas',
+                    data: [
+                        estatisticas.concluidas,
+                        estatisticas.pendentes,
+                        estatisticas.porPrioridade.alta,
+                        estatisticas.porPrioridade.media,
+                        estatisticas.porPrioridade.baixa
+                    ],
+                    backgroundColor: ['#28a745', '#dc3545', '#e74c3c', '#f1c40f', '#3498db']
+                }]
+            },
+            plugins: [ChartDataLabels],
+            options: {
+                responsive: false,
+                layout: { padding: { top: 20 } },
+                plugins: {
+                    legend: { display: false },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        offset: -4,
+                        color: '#000',
+                        font: { weight: 'bold', size: 12 }
+                    }
+                }
+            }
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 600));
+        const imgData = canvas.toDataURL("image/png");
+        doc.addPage();
+        doc.setFontSize(12);
+        doc.text("Gráfico de Estatísticas", 14, 20);
+        doc.addImage(imgData, 'PNG', 15, 30, 180, 100);
+
+        const totalPaginas = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPaginas; i++) {
+            doc.setPage(i);
+            doc.setFontSize(9);
+            doc.setTextColor(150);
+            doc.text(`Página ${i} de ${totalPaginas}`, 180, 290, { align: "right" });
+        }
+        doc.save('relatorio_tarefas.pdf');
+    });
 }
 
 app();
