@@ -21,18 +21,18 @@ function calcularDuracaoComDayjs(dataInicioStr, dataFimStr, maxPartes = 2) {
     const duracao = dayjs.duration(duracaoMs);
 
     const unidades = [
-        { valor: duracao.years(), nome: 'ano' },
-        { valor: duracao.months(), nome: 'mês' },
-        { valor: duracao.days(), nome: 'dia' },
-        { valor: duracao.hours(), nome: 'hora' },
-        { valor: duracao.minutes(), nome: 'minuto' },
-        { valor: duracao.seconds(), nome: 'segundo' }
+        { valor: duracao.years(), singular: 'ano', plural: 'anos' },
+        { valor: duracao.months(), singular: 'mês', plural: 'meses' },
+        { valor: duracao.days(), singular: 'dia', plural: 'dias' },
+        { valor: duracao.hours(), singular: 'hora', plural: 'horas' },
+        { valor: duracao.minutes(), singular: 'minuto', plural: 'minutos' },
+        { valor: duracao.seconds(), singular: 'segundo', plural: 'segundos' }
     ];
 
     // Filtrar unidades relevantes (> 0) e formatar
     const partesRelevantes = unidades
         .filter(u => u.valor)
-        .map(u => `${u.valor} ${u.valor === 1 ? u.nome : u.nome + 's'}`)
+        .map(u => `${u.valor} ${u.valor === 1 ? u.singular : u.plural}`)
         .slice(0, maxPartes);
 
     if (partesRelevantes.length === 0) return 'Levou menos de 1 segundo';

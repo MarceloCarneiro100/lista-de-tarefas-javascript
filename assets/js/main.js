@@ -19,7 +19,6 @@ function app() {
     let paginaAtual = 1;
     const tarefasPorPagina = 5;
 
-
     const nomesPrioridades = {
         baixa: 'Baixa',
         media: 'Média',
@@ -145,7 +144,7 @@ function app() {
             texto,
             prioridade,
             concluida: false,
-            criacao: new Date().toLocaleString('pt-BR'),
+            criacao: dayjs().format('DD/MM/YYYY HH:mm:ss'),
             conclusao: null
         };
 
@@ -228,7 +227,7 @@ function app() {
         if (item.classList.contains('concluida')) {
 
             const dataCriacao = item.getAttribute('data-criacao');
-            const dataConclusao = new Date().toLocaleString('pt-BR');
+            const dataConclusao = dayjs().format('DD/MM/YYYY HH:mm:ss');
             item.setAttribute('data-conclusao', dataConclusao);
 
             const duracaoMs = parseDataBR(dataConclusao) - parseDataBR(dataCriacao);
@@ -322,10 +321,41 @@ function app() {
         const termo = inputBusca.value.trim().toLowerCase();
         const status = filtroStatus.value;
         const prioridadeSelecionada = filtroPrioridade.value;
-
+        const periodo = document.getElementById('filtro-periodo').value;
         const tarefas = document.querySelectorAll('.item-tarefa');
 
+        const correspondePeriodo = (tarefa) => {
+
+            if (periodo === 'todas') return true;
+
+            const dataCriacao = tarefa.getAttribute('data-criacao')?.trim();
+            const dataConclusao = tarefa.getAttribute('data-conclusao')?.trim();
+
+            const criadaEm = dayjs(dataCriacao, 'DD/MM/YYYY HH:mm:ss');
+            const concluidaEm = dataConclusao
+                ? dayjs(dataConclusao, 'DD/MM/YYYY HH:mm:ss')
+                : null;
+
+            const dataRef = tarefa.classList.contains('concluida') ? concluidaEm : criadaEm;
+
+            const hoje = dayjs().format('YYYY-MM-DD');
+            const dataEhValida = dataRef?.isValid?.();
+            const dataFormatada = dataRef?.format?.('YYYY-MM-DD');
+            const correspondeHoje = dataFormatada === hoje;
+            const corresponde7dias = dayjs().diff(dataRef, 'day') <= 7;
+            const corresponde30dias = dayjs().diff(dataRef, 'day') <= 30;
+
+            if (!dataRef || !dataEhValida) return false;
+            if (periodo === 'hoje') return correspondeHoje;
+            if (periodo === '7dias') return corresponde7dias;
+            if (periodo === '30dias') return corresponde30dias;
+
+            return true;
+        };
+
+
         tarefas.forEach(tarefa => {
+
             const texto = tarefa.querySelector('.texto-tarefa').innerText.toLowerCase();
             const concluida = tarefa.classList.contains('concluida');
             const prioridade = tarefa.getAttribute('data-prioridade');
@@ -336,9 +366,16 @@ function app() {
                 (status === 'concluidas' && concluida) ||
                 (status === 'pendentes' && !concluida);
 
-            const correspondePrioridade = prioridadeSelecionada === 'todas' || prioridadeSelecionada === prioridade;
+            const correspondePrioridade =
+                prioridadeSelecionada === 'todas' || prioridadeSelecionada === prioridade;
+            const correspondeData = correspondePeriodo(tarefa);
 
-            const deveExibir = correspondeTexto && correspondeStatus && correspondePrioridade;
+            const deveExibir =
+                correspondeTexto &&
+                correspondeStatus &&
+                correspondePrioridade &&
+                correspondeData;
+
             tarefa.style.display = deveExibir ? 'flex' : 'none';
         });
 
@@ -509,6 +546,9 @@ function app() {
     document.getElementById('btn-topo').addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+
+    document.getElementById('filtro-periodo').addEventListener('change', aplicarBuscaEFiltro);
+
 
     registrarFechamentoModal('modal-editar', 'btn-fechar-edicao');
     registrarFechamentoModal('modal-editar', 'btn-cancelar');

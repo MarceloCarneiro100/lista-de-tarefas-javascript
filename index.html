@@ -24,20 +24,31 @@
             </div>
             <div class="filtros">
 
-                <select id="filtro-status">
-                    <option value="todas">Todas</option>
-                    <option value="pendentes">Pendentes</option>
-                    <option value="concluidas">Concluídas</option>
-                </select>
+                <div class="filtro-status-prioridade">
+                    <select id="filtro-status">
+                        <option value="todas">Todas</option>
+                        <option value="pendentes">Pendentes</option>
+                        <option value="concluidas">Concluídas</option>
+                    </select>
 
-                <select id="filtro-prioridade">
-                    <option value="todas">Todas as prioridades</option>
-                    <option value="alta">🔴 Alta</option>
-                    <option value="media">🟡 Média</option>
-                    <option value="baixa">🔵 Baixa</option>
-                </select>
+                    <select id="filtro-prioridade">
+                        <option value="todas">Todas as prioridades</option>
+                        <option value="alta">🔴 Alta</option>
+                        <option value="media">🟡 Média</option>
+                        <option value="baixa">🔵 Baixa</option>
+                    </select>
+                </div>
 
-                <input type="text" id="input-busca" placeholder="🔎 Buscar tarefa...">
+                <div class="filtro-periodo-buscar">
+                    <select id="filtro-periodo">
+                        <option value="todas">🗓️ Todas (sem filtro por data)</option>
+                        <option value="hoje">🗓️ Hoje</option>
+                        <option value="7dias">🗓️ Últimos 7 dias</option>
+                        <option value="30dias">🗓️ Últimos 30 dias</option>
+                    </select>
+
+                    <input type="text" id="input-busca" placeholder="🔎 Buscar tarefa...">
+                </div>
             </div>
         </div>
         <form class="form">
@@ -115,10 +126,12 @@
     <button id="btn-topo" title="Voltar ao topo">🔝</button>
 
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/duration.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/relativeTime.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/pt-br.js"></script>
     <script>
+        dayjs.extend(window.dayjs_plugin_customParseFormat);
         dayjs.extend(dayjs_plugin_duration);
         dayjs.extend(dayjs_plugin_relativeTime);
         dayjs.locale('pt-br');
