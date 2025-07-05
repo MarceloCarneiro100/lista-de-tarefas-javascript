@@ -26,7 +26,7 @@ body {
 
 .container {
     max-width: 768px;
-    margin: 30px auto;
+    margin: 15px auto;
     background-color: #fff;
     padding: 20px;
     border-radius: 10px;
@@ -308,9 +308,15 @@ select.prioridade {
     text-align: right;
 }
 
-#btn-relatorio-pdf {
+.botoes-relatorio {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.botoes-relatorio #btn-relatorio-pdf,
+.botoes-relatorio #btn-excluir-todas {
     margin-left: 10px;
-    background-color: var(--info-color);
     color: white;
     border: none;
     padding: 6px 12px;
@@ -318,10 +324,23 @@ select.prioridade {
     font-weight: bold;
     cursor: pointer;
     font-size: 0.95rem;
+    transition: background 0.3s;
+}
+
+#btn-relatorio-pdf {
+    background-color: var(--info-color);
 }
 
 #btn-relatorio-pdf:hover {
     background-color: #005fa3;
+}
+
+#btn-excluir-todas {
+    background-color: #e74c3c;
+}
+
+#btn-excluir-todas:hover {
+    background-color: #c0392b;
 }
 
 .prioridade-texto.alta {
@@ -548,7 +567,9 @@ select.prioridade {
 .botoes-modal #btn-cancelar,
 .botoes-modal #btn-cancelar-info,
 .botoes-modal #btn-confirmar-importacao,
-.botoes-modal #btn-cancelar-importacao {
+.botoes-modal #btn-cancelar-importacao,
+.botoes-modal #btn-confirmar-exclusao,
+.botoes-modal #btn-cancelar-exclusao {
     border: none;
     color: #fff;
     font-size: 18px;
@@ -567,24 +588,60 @@ select.prioridade {
     background: var(--primary-color);
 }
 
+.botoes-modal #btn-confirmar-exclusao {
+    background: var(--danger-color);
+}
+
+.botoes-modal #btn-confirmar-exclusao:hover {
+    background: rgb(243, 19, 19);
+}
+
 .botoes-modal #btn-salvar:hover {
     background: var(--primary-color-darker);
 }
 
 .botoes-modal #btn-cancelar,
 .botoes-modal #btn-cancelar-info,
-.botoes-modal #btn-cancelar-importacao {
+.botoes-modal #btn-cancelar-importacao,
+.botoes-modal #btn-cancelar-exclusao {
     background: var(--secondary-color);
 }
 
 .botoes-modal #btn-cancelar:hover,
 .botoes-modal #btn-cancelar-info:hover,
-.botoes-modal #btn-cancelar-importacao:hover {
+.botoes-modal #btn-cancelar-importacao:hover,
+.botoes-modal #btn-cancelar-exclusao:hover {
     background: rgb(189, 180, 180);
 }
 
 .botoes-modal #btn-confirmar-importacao:hover {
     background: var(--primary-color-darker);
+}
+
+@keyframes tremer {
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-4px);
+    }
+
+    50% {
+        transform: translateX(4px);
+    }
+
+    75% {
+        transform: translateX(-4px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.tremer {
+    animation: tremer 0.3s ease;
 }
 
 #btn-topo {

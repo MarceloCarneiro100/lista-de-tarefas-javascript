@@ -67,7 +67,10 @@
         </form>
         <div id="resumo-tarefas" class="resumo-tarefas">
             🔎 <span id="contador-tarefas">x tarefas encontradas</span>
-            <button id="btn-relatorio-pdf" title="Gerar relatório em PDF">📄 Gerar PDF</button>
+            <div class="botoes-relatorio">
+                <button id="btn-relatorio-pdf" title="Gerar relatório em PDF">📄 Gerar PDF</button>
+                <button id="btn-excluir-todas" title="Excluir todas as tarefas">🗑️ Excluir todas</button>
+            </div>
         </div>
 
         <ul class="tarefas"></ul>
@@ -123,6 +126,17 @@
             <div class="botoes-modal">
                 <button id="btn-confirmar-importacao">Sim, substituir</button>
                 <button id="btn-cancelar-importacao">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-confirmar-apagar-tudo">
+        <div class="modal-conteudo">
+            <button id="fechar-modal-apagar" class="fechar-modal" title="Fechar confirmação">&times;</button>
+            <p>Tem certeza de que deseja apagar <strong>todas</strong> as tarefas?</p>
+            <div class="botoes-modal">
+                <button id="btn-confirmar-exclusao">Sim, excluir</button>
+                <button id="btn-cancelar-exclusao">Cancelar</button>
             </div>
         </div>
     </div>

@@ -14,7 +14,11 @@ function app() {
     const filtroPrioridade = document.getElementById('filtro-prioridade');
     const btnExportar = document.getElementById('btn-exportar');
     const inputImportar = document.getElementById('input-importar');
-
+    const btnExcluirTodas = document.getElementById('btn-excluir-todas');
+    const modalConfirmacaoApagarTudo = document.getElementById('modal-confirmar-apagar-tudo');
+    const btnConfirmarExclusao = document.getElementById('btn-confirmar-exclusao');
+   
+    
     let tarefasImportadasTemporarias = [];
     let paginaAtual = 1;
     const tarefasPorPagina = 5;
@@ -586,6 +590,24 @@ function app() {
         location.reload();
     });
 
+    btnExcluirTodas?.addEventListener('click', () => {
+        const tarefas = JSON.parse(localStorage.getItem('tarefas') || '[]');
+
+        if (tarefas.length > 0) {
+            abrirModal(modalConfirmacaoApagarTudo);
+        } else {
+            btnExcluirTodas.classList.add('tremer');
+            setTimeout(() => {
+                btnExcluirTodas.classList.remove('tremer');
+            }, 300);
+        }
+    });
+
+    btnConfirmarExclusao?.addEventListener('click', () => {
+        localStorage.removeItem('tarefas');
+        location.reload();
+    });
+
     function registrarFechamentoModal(idModal, idBotaoFechar) {
         const botao = document.getElementById(idBotaoFechar);
         const modal = document.getElementById(idModal);
@@ -615,6 +637,8 @@ function app() {
     registrarFechamentoModal('modal-info', 'btn-cancelar-info');
     registrarFechamentoModal('modal-confirmar-importacao', 'btn-cancelar-importacao');
     registrarFechamentoModal('modal-confirmar-importacao', 'fechar-modal-importar');
+    registrarFechamentoModal('modal-confirmar-apagar-tudo', 'btn-cancelar-exclusao');
+    registrarFechamentoModal('modal-confirmar-apagar-tudo', 'fechar-modal-apagar');
 
     carregaTarefasDoLocalStorage();
     aplicarBuscaEFiltro();
