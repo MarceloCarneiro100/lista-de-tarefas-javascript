@@ -541,12 +541,7 @@ function app() {
     filtroPrioridade.addEventListener('change', aplicarBuscaEFiltro);
     inputBusca.addEventListener('input', aplicarBuscaEFiltro);
 
-
-    btnCancelar.addEventListener('click', function () {
-        const modal = document.getElementById('modal-editar');
-        fecharModal(modal);
-    });
-
+    
     btnExportar.addEventListener('click', () => {
         const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
         const json = JSON.stringify(tarefas, null, 2);

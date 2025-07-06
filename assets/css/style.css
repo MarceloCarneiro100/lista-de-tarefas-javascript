@@ -303,6 +303,7 @@ select.prioridade {
 
 .resumo-tarefas {
     font-size: 0.95rem;
+    font-weight: bold;
     opacity: 0.8;
     margin-bottom: 8px;
     text-align: right;
@@ -667,5 +668,100 @@ select.prioridade {
 @media (hover: none) {
     .item-tarefa.concluida .detalhar {
         opacity: 1;
+    }
+}
+
+/* responsividade */
+@media(max-width: 784px) {
+
+    .filtros,
+    #input-tarefa,
+    #input-prioridade,
+    .texto-tarefa {
+        font-size: 0.89em;
+    }
+
+    #btn-tarefa {
+        font-size: 0.80em;
+    }
+
+    #filtro-status,
+    #filtro-prioridade,
+    #filtro-periodo,
+    #input-busca {
+        width: 100%;
+    }
+
+    #input-tarefa,
+    #input-prioridade,
+    #btn-tarefa {
+        height: 40px;
+    }
+
+    .editar,
+    .apagar,
+    .detalhar {
+        width: 32px;
+        height: 32px;
+        padding: 2px;
+    }
+
+    .editar i,
+    .apagar i,
+    .detalhar i {
+        font-size: 12px;
+    }
+}
+
+@media(max-width: 662px) {
+
+    .resumo-tarefas {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .badge {
+        display: none;
+    }
+
+    .item-tarefa {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .texto-tarefa {
+        margin-right: 10px;
+        align-self: center;
+    }
+
+    .botoes-acoes {
+        align-self: center;
+    }
+}
+
+@media(max-width: 514px) {
+    .linha-tarefa {
+        flex-direction: column;
+    }
+
+    #input-tarefa,
+    #input-prioridade,
+    #btn-tarefa {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+
+    #btn-tarefa {
+        border-bottom: 3px;
+    }
+}
+
+@media(max-width: 320px) {
+    h1 {
+        font-size: 25px;
     }
 }
