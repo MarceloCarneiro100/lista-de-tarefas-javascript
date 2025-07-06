@@ -316,7 +316,8 @@ select.prioridade {
 }
 
 .botoes-relatorio #btn-relatorio-pdf,
-.botoes-relatorio #btn-excluir-todas {
+.botoes-relatorio #btn-excluir-todas,
+.botoes-relatorio #btn-exibir-grafico {
     margin-left: 10px;
     color: white;
     border: none;
@@ -342,6 +343,20 @@ select.prioridade {
 
 #btn-excluir-todas:hover {
     background-color: #c0392b;
+}
+
+#btn-exibir-grafico {
+    background-color: #6c5ce7;
+}
+
+#btn-exibir-grafico:hover {
+    background-color: #5a4bcf;
+}
+
+#canvas-grafico {
+    width: 100% !important;
+    height: auto !important;
+    margin-top: 10px;
 }
 
 .prioridade-texto.alta {
@@ -740,6 +755,10 @@ select.prioridade {
     .botoes-acoes {
         align-self: center;
     }
+
+    .modal-conteudo h2 {
+        font-size: 22px;
+    }
 }
 
 @media(max-width: 514px) {
@@ -758,10 +777,25 @@ select.prioridade {
     #btn-tarefa {
         border-bottom: 3px;
     }
+
+    .botoes-relatorio {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .modal-conteudo h2 {
+        font-size: 20px;
+    }
+
 }
 
 @media(max-width: 320px) {
     h1 {
         font-size: 25px;
+    }
+
+    .modal-conteudo h2 {
+        font-size: 17px;
     }
 }

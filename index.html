@@ -72,6 +72,7 @@
             </div>
             <div class="botoes-relatorio">
                 <button id="btn-relatorio-pdf" title="Gerar relatório em PDF">📄 Gerar PDF</button>
+                <button id="btn-exibir-grafico" title="Exibir gráfico em tela">📊 Gerar Gráfico</button>
                 <button id="btn-excluir-todas" title="Excluir todas as tarefas">🗑️ Excluir todas</button>
             </div>
         </div>
@@ -143,6 +144,15 @@
             </div>
         </div>
     </div>
+
+    <div class="modal" id="modal-grafico">
+        <div class="modal-conteudo" style="max-width: 800px; width: 95%; position: relative;">
+            <button id="fechar-modal-grafico" class="fechar-modal" title="Fechar gráfico">&times;</button>
+            <h2>📊 Gráfico de Tarefas</h2>
+            <canvas id="canvas-grafico" style="width: 100%; max-height: 400px;"></canvas>
+        </div>
+    </div>
+
 
     <button id="btn-topo" title="Voltar ao topo">🔝</button>
 

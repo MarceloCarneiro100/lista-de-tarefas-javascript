@@ -6,7 +6,6 @@ function app() {
     const tarefasUl = document.querySelector('.tarefas');
     const inputEdicao = document.getElementById('input-edicao');
     const btnSalvar = document.getElementById('btn-salvar');
-    const btnCancelar = document.getElementById('btn-cancelar');
     const inputBusca = document.getElementById('input-busca');
     const filtroStatus = document.getElementById('filtro-status');
     const inputPrioridade = document.getElementById('input-prioridade');
@@ -17,8 +16,8 @@ function app() {
     const btnExcluirTodas = document.getElementById('btn-excluir-todas');
     const modalConfirmacaoApagarTudo = document.getElementById('modal-confirmar-apagar-tudo');
     const btnConfirmarExclusao = document.getElementById('btn-confirmar-exclusao');
-   
-    
+
+
     let tarefasImportadasTemporarias = [];
     let paginaAtual = 1;
     const tarefasPorPagina = 5;
@@ -30,6 +29,7 @@ function app() {
     }
 
     let liAtual = null;  // Referência à tarefa sendo editada
+    let graficoTela = null;
 
     function criaLi() {
         const li = document.createElement('li');
@@ -541,7 +541,7 @@ function app() {
     filtroPrioridade.addEventListener('change', aplicarBuscaEFiltro);
     inputBusca.addEventListener('input', aplicarBuscaEFiltro);
 
-    
+
     btnExportar.addEventListener('click', () => {
         const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
         const json = JSON.stringify(tarefas, null, 2);
@@ -634,9 +634,78 @@ function app() {
     registrarFechamentoModal('modal-confirmar-importacao', 'fechar-modal-importar');
     registrarFechamentoModal('modal-confirmar-apagar-tudo', 'btn-cancelar-exclusao');
     registrarFechamentoModal('modal-confirmar-apagar-tudo', 'fechar-modal-apagar');
+    registrarFechamentoModal('modal-grafico', 'fechar-modal-grafico');
 
     carregaTarefasDoLocalStorage();
     aplicarBuscaEFiltro();
+
+    function calcularEstatisticas(tarefas) {
+        return {
+            total: tarefas.length,
+            concluidas: tarefas.filter(t => t.concluida).length,
+            pendentes: tarefas.filter(t => !t.concluida).length,
+            porPrioridade: {
+                alta: tarefas.filter(t => t.prioridade === 'alta').length,
+                media: tarefas.filter(t => t.prioridade === 'media').length,
+                baixa: tarefas.filter(t => t.prioridade === 'baixa').length
+            }
+        };
+    }
+
+    function renderizarGraficoTarefas(estatisticas, ctx, responsivo = true) {
+        return new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Concluídas', 'Pendentes', 'Alta', 'Média', 'Baixa'],
+                datasets: [{
+                    label: 'Estatísticas',
+                    data: [
+                        estatisticas.concluidas,
+                        estatisticas.pendentes,
+                        estatisticas.porPrioridade.alta,
+                        estatisticas.porPrioridade.media,
+                        estatisticas.porPrioridade.baixa
+                    ],
+                    backgroundColor: ['#28a745', '#dc3545', '#e74c3c', '#f1c40f', '#3498db']
+                }]
+            },
+            plugins: [ChartDataLabels],
+            options: {
+                responsive: responsivo,
+                maintainAspectRatio: responsivo,
+                layout: { padding: { top: 20 } },
+                plugins: {
+                    legend: { display: false },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        offset: -4,
+                        color: '#000',
+                        font: { weight: 'bold', size: 12 }
+                    }
+                }
+            }
+        });
+    }
+
+    function exibirGraficoEmModal() {
+        const tarefas = getTodasTarefasFiltradas();
+        if (tarefas.length === 0) {
+            alert('Nenhuma tarefa encontrada para gerar o gráfico.');
+            return;
+        }
+
+        const estatisticas = calcularEstatisticas(tarefas);
+        const canvas = document.getElementById('canvas-grafico');
+        const ctx = canvas.getContext('2d');
+
+        // Destrói gráfico anterior se existir
+        if (graficoTela) graficoTela.destroy();
+
+        graficoTela = renderizarGraficoTarefas(estatisticas, ctx, true);
+
+        abrirModal(document.getElementById('modal-grafico'));
+    }
 
     // Plugin de rótulo de dados para o gráfico
     Chart.register(ChartDataLabels);
@@ -655,20 +724,8 @@ function app() {
             periodo: document.getElementById('filtro-periodo').value
         };
 
-        function calcularEstatisticas(tarefas) {
-            return {
-                total: tarefas.length,
-                concluidas: tarefas.filter(t => t.concluida).length,
-                pendentes: tarefas.filter(t => !t.concluida).length,
-                porPrioridade: {
-                    alta: tarefas.filter(t => t.prioridade === 'alta').length,
-                    media: tarefas.filter(t => t.prioridade === 'media').length,
-                    baixa: tarefas.filter(t => t.prioridade === 'baixa').length
-                }
-            };
-        }
-
         const estatisticas = calcularEstatisticas(tarefas);
+
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         doc.setFont("courier", "bold");
@@ -759,38 +816,7 @@ function app() {
         canvas.height = 360;
         const ctx = canvas.getContext('2d');
 
-        await new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Concluídas', 'Pendentes', 'Alta', 'Média', 'Baixa'],
-                datasets: [{
-                    label: 'Estatísticas',
-                    data: [
-                        estatisticas.concluidas,
-                        estatisticas.pendentes,
-                        estatisticas.porPrioridade.alta,
-                        estatisticas.porPrioridade.media,
-                        estatisticas.porPrioridade.baixa
-                    ],
-                    backgroundColor: ['#28a745', '#dc3545', '#e74c3c', '#f1c40f', '#3498db']
-                }]
-            },
-            plugins: [ChartDataLabels],
-            options: {
-                responsive: false,
-                layout: { padding: { top: 20 } },
-                plugins: {
-                    legend: { display: false },
-                    datalabels: {
-                        anchor: 'end',
-                        align: 'top',
-                        offset: -4,
-                        color: '#000',
-                        font: { weight: 'bold', size: 12 }
-                    }
-                }
-            }
-        });
+        await renderizarGraficoTarefas(estatisticas, ctx, false);
 
         await new Promise(resolve => setTimeout(resolve, 600));
         const imgData = canvas.toDataURL("image/png");
@@ -808,6 +834,9 @@ function app() {
         }
         doc.save('relatorio_tarefas.pdf');
     });
+
+    document.getElementById('btn-exibir-grafico').addEventListener('click', exibirGraficoEmModal);
+
 }
 
 app();
