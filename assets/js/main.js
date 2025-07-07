@@ -235,12 +235,16 @@ function app() {
             const dataConclusao = dayjs().format('DD/MM/YYYY HH:mm:ss');
             item.setAttribute('data-conclusao', dataConclusao);
 
-            const duracaoMs = parseDataBR(dataConclusao) - parseDataBR(dataCriacao);
+            const inicio = dayjs(dataCriacao, 'DD/MM/YYYY HH:mm:ss');
+            const fim = dayjs(dataConclusao, 'DD/MM/YYYY HH:mm:ss');
+            const duracaoMs = fim.diff(inicio);
             item.setAttribute('data-duracao', duracaoMs.toString());
 
             if (duracaoEl) {
-                duracaoEl.innerHTML = `<p>⌚ Duração: <b>${calcularDuracaoComDayjs(dataCriacao, dataConclusao)}</b></p>`;
+                const duracaoFormatada = formatarDuracao(duracaoMs);
+                duracaoEl.innerHTML = `<p>⌚ Duração: <b>${duracaoFormatada}</b></p>`;
             }
+
 
             // Adiciona ícone visual
             if (!item.querySelector('.icone-check')) {
@@ -304,9 +308,8 @@ function app() {
         const prioridade = li.getAttribute('data-prioridade');
         const criacao = li.getAttribute('data-criacao') || '---';
         const conclusao = li.getAttribute('data-conclusao') || '---';
-        const duracao = li.getAttribute('data-conclusao')
-            ? calcularDuracaoComDayjs(criacao, conclusao)
-            : '---';
+        const duracao = parseInt(li.getAttribute('data-duracao')) || null;
+
         return { tarefa, prioridade, criacao, conclusao, duracao };
     }
 
@@ -319,8 +322,13 @@ function app() {
             `<p><strong>📅 Criada:</strong> ${criacao}</p>`;
         document.querySelector('#modal-info .info-conclusao').innerHTML =
             `<p><strong>✅ Concluída:</strong> ${conclusao}</p>`;
+
+        const textoDuracao = (duracao && !isNaN(duracao))
+            ? formatarDuracao(duracao)
+            : '--';
+
         document.querySelector('#modal-info .info-duracao').innerHTML =
-            `<p><strong>⌚ Duração:</strong> ${duracao}</p>`;
+            `<p><strong>⌚ Duração:</strong> ${textoDuracao}</p>`;
         document.getElementById('modal-info').classList.add('ativo');
     }
 
@@ -781,24 +789,10 @@ function app() {
             const status = (t.concluida ? "Concluída" : "Pendente ").padEnd(10, ' ');
             const prioridade = (t.prioridade || "").padEnd(8, ' ');
 
-            let duracaoFormatada = "--";
-            if (t.concluida && t.duracao && !isNaN(parseInt(t.duracao))) {
-                const ms = parseInt(t.duracao);
-                const segundos = Math.floor(ms / 1000) % 60;
-                const minutos = Math.floor(ms / 60000) % 60;
-                const horas = Math.floor(ms / 3600000) % 24;
-                const dias = Math.floor(ms / 86400000);
-                const partes = [];
-
-                if (dias > 0) partes.push(`${dias}d`);
-                if (horas > 0) partes.push(`${horas}h`);
-                if (minutos > 0) partes.push(`${minutos}min`);
-                if (segundos > 0 && dias === 0 && horas === 0) partes.push(`${segundos}s`);
-
-                duracaoFormatada = partes.join(" ").padEnd(8, ' ');
-            } else {
-                duracaoFormatada = duracaoFormatada.padEnd(8, ' ');
-            }
+            const ms = parseInt(t.duracao);
+            const duracaoFormatada = (!isNaN(ms) && t.concluida)
+                ? formatarDuracao(ms, { abreviado: true }).padEnd(10, ' ')
+                : "--".padEnd(10, ' ');
 
             const linha = `${numero} | ${texto} | ${status} | ${prioridade} | ${duracaoFormatada}`;
             doc.text(linha, 14, y);

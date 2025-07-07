@@ -5,39 +5,38 @@ function parseDataBR(dataStr) {
     return dayjs(`${ano}-${mes}-${dia}T${hora}`);
 }
 
-function calcularDuracaoComDayjs(dataInicioStr, dataFimStr, maxPartes = 2) {
-    const inicio = parseDataBR(dataInicioStr);
-    const fim = parseDataBR(dataFimStr);
+function formatarDuracao(ms, { abreviado = false, maxPartes = 2 } = {}) {
+    if (typeof ms !== 'number' || isNaN(ms)) return '--';
 
-    if (!inicio.isValid() || !fim.isValid()) {
-        return 'Data inválida';
-    }
+    const duracao = dayjs.duration(ms);
 
-    if (inicio.isAfter(fim)) {
-        return 'Data de início posterior à de conclusão';
-    }
+    const unidades = abreviado
+        ? [
+            { valor: duracao.years(), rótulo: 'a' },
+            { valor: duracao.months(), rótulo: 'm' },
+            { valor: duracao.days(), rótulo: 'd' },
+            { valor: duracao.hours(), rótulo: 'h' },
+            { valor: duracao.minutes(), rótulo: 'min' },
+            { valor: duracao.seconds(), rótulo: 's' }
+        ]
+        : [
+            { valor: duracao.years(), singular: 'ano', plural: 'anos' },
+            { valor: duracao.months(), singular: 'mês', plural: 'meses' },
+            { valor: duracao.days(), singular: 'dia', plural: 'dias' },
+            { valor: duracao.hours(), singular: 'hora', plural: 'horas' },
+            { valor: duracao.minutes(), singular: 'minuto', plural: 'minutos' },
+            { valor: duracao.seconds(), singular: 'segundo', plural: 'segundos' }
+        ];
 
-    const duracaoMs = fim.diff(inicio);
-    const duracao = dayjs.duration(duracaoMs);
+    const partes = unidades
+        .filter(u => u.valor > 0)
+        .slice(0, maxPartes)
+        .map(u => abreviado
+            ? `${u.valor}${u.rótulo}`
+            : `${u.valor} ${u.valor === 1 ? u.singular : u.plural}`
+        );
 
-    const unidades = [
-        { valor: duracao.years(), singular: 'ano', plural: 'anos' },
-        { valor: duracao.months(), singular: 'mês', plural: 'meses' },
-        { valor: duracao.days(), singular: 'dia', plural: 'dias' },
-        { valor: duracao.hours(), singular: 'hora', plural: 'horas' },
-        { valor: duracao.minutes(), singular: 'minuto', plural: 'minutos' },
-        { valor: duracao.seconds(), singular: 'segundo', plural: 'segundos' }
-    ];
-
-    // Filtrar unidades relevantes (> 0) e formatar
-    const partesRelevantes = unidades
-        .filter(u => u.valor)
-        .map(u => `${u.valor} ${u.valor === 1 ? u.singular : u.plural}`)
-        .slice(0, maxPartes);
-
-    if (partesRelevantes.length === 0) return 'Levou menos de 1 segundo';
-    if (partesRelevantes.length === 1) return `Levou cerca de ${partesRelevantes[0]}`;
-
-    const ultima = partesRelevantes.pop();
-    return `Levou cerca de ${partesRelevantes.join(', ')} e ${ultima}`;
+    return partes.length
+        ? abreviado ? partes.join(' e ') : `Levou cerca de ${partes.join(', ').replace(/, ([^,]*)$/, ' e $1')}`
+        : abreviado ? '--' : 'Levou menos de 1 segundo';
 }
