@@ -332,65 +332,54 @@ function app() {
         document.getElementById('modal-info').classList.add('ativo');
     }
 
-    function aplicarBuscaEFiltro() {
+    function filtrarTarefas(li) {
         const termo = inputBusca.value.trim().toLowerCase();
         const status = filtroStatus.value;
         const prioridadeSelecionada = filtroPrioridade.value;
         const periodo = document.getElementById('filtro-periodo').value;
-        const tarefas = document.querySelectorAll('.item-tarefa');
 
-        const correspondePeriodo = (tarefa) => {
+        const texto = li.querySelector('.texto-tarefa').innerText.toLowerCase();
+        const concluida = li.classList.contains('concluida');
+        const prioridade = li.getAttribute('data-prioridade');
 
-            if (periodo === 'todas') return true;
+        const correspondeTexto = texto.includes(termo);
+        const correspondeStatus =
+            status === 'todas' ||
+            (status === 'concluidas' && concluida) ||
+            (status === 'pendentes' && !concluida);
+        const correspondePrioridade =
+            prioridadeSelecionada === 'todas' || prioridadeSelecionada === prioridade;
 
-            const dataCriacao = tarefa.getAttribute('data-criacao')?.trim();
-            const dataConclusao = tarefa.getAttribute('data-conclusao')?.trim();
+        const dataCriacao = li.getAttribute('data-criacao')?.trim();
+        const dataConclusao = li.getAttribute('data-conclusao')?.trim();
+        const criadaEm = dayjs(dataCriacao, 'DD/MM/YYYY HH:mm:ss');
+        const concluidaEm = dataConclusao ? dayjs(dataConclusao, 'DD/MM/YYYY HH:mm:ss') : null;
 
-            const criadaEm = dayjs(dataCriacao, 'DD/MM/YYYY HH:mm:ss');
-            const concluidaEm = dataConclusao
-                ? dayjs(dataConclusao, 'DD/MM/YYYY HH:mm:ss')
-                : null;
+        const dataRef = concluida ? concluidaEm : criadaEm;
+        const hoje = dayjs().format('YYYY-MM-DD');
+        const dataEhValida = dataRef?.isValid?.();
+        const dataFormatada = dataRef?.format?.('YYYY-MM-DD');
+        const correspondeHoje = dataFormatada === hoje;
+        const corresponde7dias = dayjs().diff(dataRef, 'day') <= 7;
+        const corresponde30dias = dayjs().diff(dataRef, 'day') <= 30;
 
-            const dataRef = tarefa.classList.contains('concluida') ? concluidaEm : criadaEm;
-
-            const hoje = dayjs().format('YYYY-MM-DD');
-            const dataEhValida = dataRef?.isValid?.();
-            const dataFormatada = dataRef?.format?.('YYYY-MM-DD');
-            const correspondeHoje = dataFormatada === hoje;
-            const corresponde7dias = dayjs().diff(dataRef, 'day') <= 7;
-            const corresponde30dias = dayjs().diff(dataRef, 'day') <= 30;
-
+        const correspondeData = (() => {
             if (!dataRef || !dataEhValida) return false;
+            if (periodo === 'todas') return true;
             if (periodo === 'hoje') return correspondeHoje;
             if (periodo === '7dias') return corresponde7dias;
             if (periodo === '30dias') return corresponde30dias;
-
             return true;
-        };
+        })();
 
+        return correspondeTexto && correspondeStatus && correspondePrioridade && correspondeData;
+    }
+
+    function aplicarBuscaEFiltro() {
+        const tarefas = document.querySelectorAll('.item-tarefa');
 
         tarefas.forEach(tarefa => {
-
-            const texto = tarefa.querySelector('.texto-tarefa').innerText.toLowerCase();
-            const concluida = tarefa.classList.contains('concluida');
-            const prioridade = tarefa.getAttribute('data-prioridade');
-
-            const correspondeTexto = texto.includes(termo);
-            const correspondeStatus =
-                status === 'todas' ||
-                (status === 'concluidas' && concluida) ||
-                (status === 'pendentes' && !concluida);
-
-            const correspondePrioridade =
-                prioridadeSelecionada === 'todas' || prioridadeSelecionada === prioridade;
-            const correspondeData = correspondePeriodo(tarefa);
-
-            const deveExibir =
-                correspondeTexto &&
-                correspondeStatus &&
-                correspondePrioridade &&
-                correspondeData;
-
+            const deveExibir = filtrarTarefas(tarefa);
             tarefa.style.display = deveExibir ? 'flex' : 'none';
         });
 
@@ -400,52 +389,9 @@ function app() {
     }
 
     function getTodasTarefasFiltradas() {
-        const termo = inputBusca.value.trim().toLowerCase();
-        const status = filtroStatus.value;
-        const prioridadeSelecionada = filtroPrioridade.value;
-        const periodo = document.getElementById('filtro-periodo').value;
         const todas = [...document.querySelectorAll('.item-tarefa')];
 
-        return todas.filter(tarefa => {
-            const texto = tarefa.querySelector('.texto-tarefa').innerText.toLowerCase();
-            const concluida = tarefa.classList.contains('concluida');
-            const prioridade = tarefa.getAttribute('data-prioridade');
-
-            const correspondeTexto = texto.includes(termo);
-            const correspondeStatus =
-                status === 'todas' ||
-                (status === 'concluidas' && concluida) ||
-                (status === 'pendentes' && !concluida);
-
-            const correspondePrioridade =
-                prioridadeSelecionada === 'todas' || prioridadeSelecionada === prioridade;
-
-            const dataCriacao = tarefa.getAttribute('data-criacao')?.trim();
-            const dataConclusao = tarefa.getAttribute('data-conclusao')?.trim();
-            const criadaEm = dayjs(dataCriacao, 'DD/MM/YYYY HH:mm:ss');
-            const concluidaEm = dataConclusao
-                ? dayjs(dataConclusao, 'DD/MM/YYYY HH:mm:ss')
-                : null;
-
-            const dataRef = tarefa.classList.contains('concluida') ? concluidaEm : criadaEm;
-            const hoje = dayjs().format('YYYY-MM-DD');
-            const dataEhValida = dataRef?.isValid?.();
-            const dataFormatada = dataRef?.format?.('YYYY-MM-DD');
-            const correspondeHoje = dataFormatada === hoje;
-            const corresponde7dias = dayjs().diff(dataRef, 'day') <= 7;
-            const corresponde30dias = dayjs().diff(dataRef, 'day') <= 30;
-
-            const correspondeData = (() => {
-                if (!dataRef || !dataEhValida) return false;
-                if (periodo === 'todas') return true;
-                if (periodo === 'hoje') return correspondeHoje;
-                if (periodo === '7dias') return corresponde7dias;
-                if (periodo === '30dias') return corresponde30dias;
-                return true;
-            })();
-
-            return correspondeTexto && correspondeStatus && correspondePrioridade && correspondeData;
-        }).map(li => ({
+        return todas.filter(filtrarTarefas).map(li => ({
             texto: li.querySelector('.texto-tarefa').innerText,
             prioridade: li.getAttribute('data-prioridade'),
             concluida: li.classList.contains('concluida'),
