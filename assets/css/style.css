@@ -677,7 +677,7 @@ select.prioridade {
 }
 
 #btn-topo {
-    background: var(--primary-color-darker);
+    background: rgba(var(--primary-color-darker), 0.3);
 }
 
 @media (hover: none) {
